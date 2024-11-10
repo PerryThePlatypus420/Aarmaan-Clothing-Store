@@ -1,0 +1,57 @@
+/* General styles for the category items */
+.categories {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 4%;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Styles for the container holding the SVG */
+.img-div {
+    width: 120px; 
+    height: 120px; 
+    background-color: rgba(192, 192, 192, 0.589);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Hover effect */
+.img-div:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+/* Active category style */
+.img-div.active {
+    /* background-color: rgba(117, 117, 117, 0.8);*/
+    border: 3px solid #000;
+}
+
+/* SVG styling */
+.category-img {
+    width: 70px; 
+    height: 70px; 
+}
+
+/* Text styling */
+.category-item p {
+    font-size: large;
+    font-weight: 600;
+    margin-top: 15px;
+}

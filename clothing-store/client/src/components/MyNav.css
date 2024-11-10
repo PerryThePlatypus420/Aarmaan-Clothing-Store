@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Titan+One&display=swap');
+
+.titan-one-regular {
+    font-family: "Titan One", sans-serif;
+    font-weight: 400, 200;
+    font-style: normal;
+}
+
+.nav-top {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 6px;
+    font-size: 0.8em;
+}
+
+.nav-bottom{
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.contact-info {
+    font-size: 12px;
+}
+
+.nav-link {
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000 !important;
+    margin-right: 35px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: rgb(112, 118, 136) !important;
+}
+
+.nav-items {
+    margin-right: 100px;
+    padding: 5px;
+}
+
+.nav-icon {
+    margin-right: 15px;
+}
+
+.cart-num {
+    top: 1rem;
+    right: 3.4rem;
+    padding: 0px 5px;
+    font-size: small;
+    background: rgb(0, 0, 0);
+    color: white;
+}
+
+#cart-svg {
+    width: 25px;
+    height: 25px;
+}
+
+.swoosh-brand {
+    display: flex;
+    align-items: center;
+}
+
+.swoosh-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.swoosh-logo {
+    width: 100px;
+    height: 60px;
+    margin-right: 10px;
+}
+
+.swoosh-text {
+    font-size: 2em;
+    color: #000;
+}
+
+/* Sidebar styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -250px;
+    height: 100%;
+    width: 250px;
+    background-color: #fff;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.sidebar .sidebar-links {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar .sidebar-links a {
+    text-decoration: none;
+    color: #000;
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.dropdown-content {
+    display: none;
+    flex-direction: column;
+    padding-left: 20px;
+}
+
+.dropdown-content.show {
+    display: flex;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+}
+
+.dropdown-content a {
+    text-decoration: none;
+    color: #000;
+    margin: 5px 0;
+}
+
+/* Media queries */
+@media (max-width: 991px) {
+    .sidebar-toggle {
+        display: block;
+    }
+
+    .navbar-nav {
+        display: none !important;
+    }
+
+    .swoosh-logo {
+        width: 80px;
+        max-height: 48px;
+    }
+
+    .swoosh-text {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 575px) {
+    .swoosh-logo {
+        width: 60px;
+        max-height: 36px;
+    }
+
+    .swoosh-text {
+        font-size: 1.2em;
+    }
+}
+
+@media (min-width: 992px) {
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .navbar-nav {
+        display: flex !important;
+    }
+}
