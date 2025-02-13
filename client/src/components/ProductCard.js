@@ -28,13 +28,13 @@ function ProductCard({ id, img, title, price }) {
       <div className="product-card">
         <div
           className="product-image-container"
-          style={{ backgroundImage: `url(${img})` }}
+          style={{ backgroundImage: `url(${img instanceof Array ? img[0] : img})` }}
         >
         </div>
         <div className="product-details">
           <h3 className="product-title text-black">{title}</h3>
           <p className="product-price text-black">Rs. {price}</p>
-          <div className="d-flex justify-content-around">
+          <div className="d-flex justify-content-between">
             <button className="add-to-cart-btn" onClick={handleAddToCart}>
               <FaCartPlus /> <span>Add to Cart</span>
             </button>

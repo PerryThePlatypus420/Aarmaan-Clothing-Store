@@ -30,7 +30,7 @@ export default function Checkout() {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/products/ids', {
+                const response = await fetch(process.env.REACT_APP_API + '/api/products/ids', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -79,7 +79,7 @@ export default function Checkout() {
                     totalAmount: total < 2500 ? total + 250 : total
                 };
 
-                const response = await fetch('http://localhost:3001/api/orders/create', {
+                const response = await fetch(process.env.REACT_APP_API + '/api/orders/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -21,7 +21,7 @@ function Wishlist() {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/products/ids', {
+                const response = await fetch(process.env.REACT_APP_API + '/api/products/ids', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

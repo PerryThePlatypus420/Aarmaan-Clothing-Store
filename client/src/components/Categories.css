@@ -1,57 +1,101 @@
-/* General styles for the category items */
-.categories {
-    width: 90%;
-    margin: auto;
+/* Centering the carousel and adjusting width */
+.carousel-container {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 4%;
     align-items: center;
-    margin-top: 40px;
+    justify-content: center;
+    position: relative;
+    width: 70%;
+    margin: 2rem auto 0; /* Added margin-top for spacing */
+    overflow: hidden;
 }
 
+/* Adjust carousel to show 5 items */
+.categories-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+    padding: 10px 0;
+    justify-content: center;
+}
+
+/* Hide scrollbar */
+.categories-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+/* Category item */
 .category-item {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    text-align: center;
+    min-width: 150px; /* Adjusted for 5 items */
     transition: transform 0.2s ease-in-out;
 }
 
-/* Styles for the container holding the SVG */
+/* Circular image container (increased size) */
 .img-div {
-    width: 120px; 
-    height: 120px; 
-    background-color: rgba(192, 192, 192, 0.589);
+    width: 130px;  /* Slightly increased size */
+    height: 130px; /* Slightly increased size */
     border-radius: 50%;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    background-color: #f1f1f1;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Category image */
+.category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Normal font for category names */
+.category-item p {
+    font-size: 1rem;
+    font-weight: normal;
+    margin-top: 8px;
+}
+
+/* Buttons */
+.carousel-btn {
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; /* Ensure buttons appear above the carousel */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-btn.left {
+    left: 10px; /* Move inside the container */
+}
+
+.carousel-btn.right {
+    right: 10px; /* Move inside the container */
 }
 
 /* Hover effect */
 .img-div:hover {
-    cursor: pointer;
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Active category style */
-.img-div.active {
-    /* background-color: rgba(117, 117, 117, 0.8);*/
-    border: 3px solid #000;
-}
-
-/* SVG styling */
-.category-img {
-    width: 70px; 
-    height: 70px; 
-}
-
-/* Text styling */
-.category-item p {
-    font-size: large;
-    font-weight: 600;
-    margin-top: 15px;
+/* Hover effect for buttons */
+.carousel-btn:hover {
+    background: rgba(200, 200, 200, 0.9);
 }

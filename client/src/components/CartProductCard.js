@@ -9,7 +9,7 @@ function CartProductCard({ id, img, title, price, count }) {
   return (
     <div className="cart-product-card">
       <div className="cart-product-image-container">
-        <img src={img} className="cart-product-image" alt={title} />
+        <img src={img instanceof Array ? img[0] : img} className="cart-product-image" alt={title} />
       </div>
       <div className="cart-product-details">
         <span>

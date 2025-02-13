@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    // the img was commented out, (for future referrence)
     img: {
         type: String,
         required: true

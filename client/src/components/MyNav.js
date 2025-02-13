@@ -8,6 +8,9 @@ import { WishlistContext } from '../wishlistContext';
 import { FiMenu } from "react-icons/fi";
 import { FaHeart, FaRegUser } from "react-icons/fa";
 import { UserContext } from '../userContext';
+import { VscDebugBreakpointData } from "react-icons/vsc";
+
+
 
 function MyNav() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,14 +38,20 @@ function MyNav() {
     return (
         <div className="nav-main">
             <div className="nav-top">
-                FREE SHIPPING ON ORDERS OVER PKR 2500!
+                آرمان is live now !
+                <Link to='/login'>
+                    <div className="circle-icon">
+                        <VscDebugBreakpointData />
+                    </div>
+                </Link>
             </div>
+
+
 
             <nav className="navbar navbar-expand-lg navbar-light bg-light nav-bottom">
                 <div className="container">
                     <Link to='/' className="navbar-brand swoosh-brand">
-                        <img src={swooshLogo} alt="swoosh logo" className="swoosh-logo" />
-                        <span className="swoosh-text titan-one-regular">SWOOSH</span>
+                        <span className="swoosh-text titan-one-regular">آرمان</span>
                     </Link>
 
                     <div className="navbar-nav d-none d-lg-flex">
@@ -66,20 +75,7 @@ function MyNav() {
                         <div className="sidebar-toggle mx-2" onClick={toggleSidebar}>
                             <h4><FiMenu /></h4>
                         </div>
-                        {user ? (
-                            <div className="dropdown mx-3">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {user.username}
-                                </button>
-                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
-                                </ul>
-                            </div>
-                        ) : (
-                            <Link to='/login' className="position-relative text-black mx-2 me-3">
-                                <FaRegUser style={{ fontSize: "25px" }} />
-                            </Link>
-                        )}
+
                         <Link to='/wishlist' className="position-relative text-black me-3">
                             <FaHeart style={{ fontSize: "25px" }} />
                             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -106,9 +102,9 @@ function MyNav() {
                                 <span className="dropdown-toggle" onClick={toggleCategory}>Categories</span>
                                 <div className={`dropdown-content ${isCategoryOpen ? 'show' : ''}`}>
                                     {categories.map((category, index) => (
-                                        <Link 
-                                            key={index} 
-                                            to={`/category/${category}`} 
+                                        <Link
+                                            key={index}
+                                            to={`/category/${category}`}
                                             onClick={() => {
                                                 toggleSidebar();
                                                 setIsCategoryOpen(false);

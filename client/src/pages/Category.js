@@ -11,7 +11,7 @@ function Category() {
 
     React.useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch(`http://localhost:3001/api/products/category/${cat}`);
+            const response = await fetch(process.env.REACT_APP_API + `/api/products/category/${cat}`);
             const data = await response.json();
             setProducts(data);
         };
@@ -25,10 +25,10 @@ function Category() {
             <Categories />
             <h1 className="mt-5">{cat}</h1>
 
-            <div className="container my-5">
+            <div className="container-fluid my-5">
                 <div className="row my-4">
                     {products.map((product, index) => (
-                        <div className="col-md-4 my-3">
+                        <div className="col-md-3 my-3">
                             <ProductCard id={product.id} 
                             title={product.title} 
                             price={product.price} 

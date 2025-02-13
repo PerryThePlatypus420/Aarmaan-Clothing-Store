@@ -7,7 +7,6 @@ import { WishlistContext } from "../wishlistContext";
 import Heart from "react-animated-heart";
 import { ThreeDots } from "react-loader-spinner";
 
-
 function Product() {
   const { addItemToCart } = useContext(CartContext);
   const { toggleItemInWishlist, isInWishlist } = useContext(WishlistContext);
@@ -15,12 +14,13 @@ function Product() {
   const { id } = useParams();
 
   const [loading, setLoading] = React.useState(true);
-
   const [product, setProduct] = React.useState(null);
 
   React.useEffect(() => {
     const fetchProduct = async () => {
-      const response = await fetch(`http://localhost:3001/api/products/${id}`);
+      const response = await fetch(
+        process.env.REACT_APP_API + `/api/products/${id}`
+      );
       const data = await response.json();
       setProduct(data);
       setLoading(false);
@@ -31,32 +31,29 @@ function Product() {
   const [items, setItems] = React.useState(1);
 
   if (loading) {
-    return <div className="d-flex justify-content-center align-items-center vh-100">
-      <ThreeDots
-        visible={true}
-        height="80"
-        width="80"
-        color="black"
-        radius="9"
-        ariaLabel="three-dots-loading"
-        wrapperStyle={{}}
-        wrapperClass=""
-      />
-    </div>
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="black"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
   }
 
-  const {
-    productDescription,
-    fabricComposition,
-    designDetails
-  } = product.description || {};
-
+  const { productDescription, fabricComposition, designDetails } =
+    product.description || {};
 
   const handleWishlist = (e) => {
     e.preventDefault();
     toggleItemInWishlist(id);
-  }
-
+  };
 
   return (
     <div className="container py-5 text-start">
@@ -64,12 +61,63 @@ function Product() {
         <div className="col-md-6 mb-4">
           {/* Product Image */}
           <div className="overflow-hidden rounded shadow-sm">
-            <img
-              src={product.img}
-              alt="Product-Image"
-              className="img-fluid w-100"
-              style={{ maxHeight: "500px", objectFit: "cover" }}
-            />
+            {product.img instanceof Array ? (
+              <div id="carouselExampleControls" className="carousel slide">
+                <div className="carousel-inner">
+                  {product.img.map((image, index) => (
+                    <div
+                      className={`carousel-item ${
+                        index === 0 ? "active" : ""
+                      }`}
+                      key={index}
+                    >
+                      <img
+                        src={image}
+                        className="d-block w-100"
+                        alt="Product-Image"
+                        style={{
+                          maxHeight: "500px",
+                          objectFit: "contain",
+                        }} // Changed to 'contain' for full image visibility
+                      />
+                    </div>
+                  ))}
+                </div>
+                <button
+                  style={{ color: "grey" }}
+                  className="carousel-control-prev"
+                  type="button"
+                  data-bs-target="#carouselExampleControls"
+                  data-bs-slide="prev"
+                >
+                  <span
+                    className="carousel-control-prev-icon"
+                    aria-hidden="true"
+                  ></span>
+                  <span className="visually-hidden">Previous</span>
+                </button>
+                <button
+                  style={{ color: "grey" }}
+                  className="carousel-control-next"
+                  type="button"
+                  data-bs-target="#carouselExampleControls"
+                  data-bs-slide="next"
+                >
+                  <span
+                    className="carousel-control-next-icon"
+                    aria-hidden="true"
+                  ></span>
+                  <span className="visually-hidden">Next</span>
+                </button>
+              </div>
+            ) : (
+              <img
+                src={product.img}
+                alt="Product-Image"
+                className="img-fluid w-100"
+                style={{ maxHeight: "500px", objectFit: "cover" }}
+              />
+            )}
           </div>
         </div>
         {/* Product Details */}
@@ -86,7 +134,8 @@ function Product() {
             {/* Product Description */}
             {productDescription && (
               <p className="mt-3">
-                <b>Product Description: </b>{productDescription}
+                <b>Product Description: </b>
+                {productDescription}
               </p>
             )}
             {fabricComposition && (
@@ -94,7 +143,9 @@ function Product() {
                 <b>Fabric Composition: </b>
                 <ul>
                   {Object.entries(fabricComposition).map(([key, value]) => (
-                    <li key={key}>{key}: {value}</li>
+                    <li key={key}>
+                      {key}: {value}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -104,13 +155,17 @@ function Product() {
                 <b>Design Details: </b>
                 <ul>
                   {Object.entries(designDetails).map(([key, value]) => (
-                    <li key={key}>{key}: {value}</li>
+                    <li key={key}>
+                      {key}: {value}
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
             {/* Product Price */}
-            <span className="h4 fw-bold text-black">Rs. {product.price}</span>
+            <span className="h4 fw-bold text-black">
+              Rs. {product.price}
+            </span>
           </div>
           {/* Quantity Input and Order Button */}
           <div className="mt-4">

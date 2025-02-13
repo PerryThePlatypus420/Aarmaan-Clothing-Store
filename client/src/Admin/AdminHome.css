@@ -1,0 +1,68 @@
+.body {
+    background-color: #f7f7f7;
+    width: 100%;
+    min-height: 100vh; /* Change height to min-height */
+    position: absolute; /* Change from absolute */
+}
+
+.card-custom{
+    height: 30vh;
+    width: 100%;
+    background-color: rgb(49, 49, 49);
+    border-radius: 20px;
+    box-shadow: 0 0 10px 0 rgba(65, 65, 65, 0.1);
+    transition: all .3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+}
+
+.card-custom:hover{
+    box-shadow: 0 0 10px 0 rgba(58, 58, 58, 0.2);
+}
+
+/* Hover effect for table rows */
+.order-row:hover {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Ensure cursor is pointer */
+.order-row {
+    cursor: pointer;
+}
+
+
+/* Ensure cursor is pointer */
+.category-row {
+    cursor: pointer;
+}
+
+/* Center align text and increase font size */
+.table th, .table td {
+    font-size: 18px;
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+/* Style for table headers */
+.table-header {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Hover effect */
+.category-row:hover {
+    background-color: #f1f1f1 !important;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Category Image */
+.category-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+}
