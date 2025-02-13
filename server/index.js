@@ -20,7 +20,7 @@ db.once('open', () => console.log('Connected to MongoDB'));
 
 // Routes
 app.use('/api/products', require('./routes/products'));
-app.use('/api/summerCollection', require('./routes/summerCollection'));
+app.use('/api/homepage-products', require('./routes/homepageProducts'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/users', require('./routes/users'));
 app.use("/api/categories", require("./routes/categories"));

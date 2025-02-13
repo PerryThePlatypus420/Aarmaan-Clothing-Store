@@ -1,59 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './MyNav.css';
-import swooshLogo from '../assets/swoosh-logo.png';
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
 import { CartContext } from '../cartContext';
 import { WishlistContext } from '../wishlistContext';
 import { FiMenu } from "react-icons/fi";
-import { FaHeart, FaRegUser } from "react-icons/fa";
-import { UserContext } from '../userContext';
+import { FaHeart } from "react-icons/fa";
 import { VscDebugBreakpointData } from "react-icons/vsc";
-
-
 
 function MyNav() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [user, setUser] = useState(null);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-    const categories = ["Tees", "Button-Shirts", "Pants", "Shoes", "Accessories"];
+    const [categories, setCategories] = useState([]);
     const { cart } = useContext(CartContext);
     const { wishlist } = useContext(WishlistContext);
-    const { user: contextUser, logout } = useContext(UserContext);
 
     useEffect(() => {
-        if (contextUser) {
-            setUser(contextUser);
-        }
-    }, [contextUser]);
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/categories');
+                const data = await response.json();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
     const toggleCategory = () => setIsCategoryOpen(!isCategoryOpen);
 
-    const handleLogout = () => {
-        logout();
-        setUser(null);
-    };
-
     return (
         <div className="nav-main">
-            <div className="nav-top">
-                آرمان is live now !
+            <div className="nav-top">آرمان is live now !
                 <Link to='/login'>
                     <div className="circle-icon">
                         <VscDebugBreakpointData />
                     </div>
                 </Link>
             </div>
-
-
-
             <nav className="navbar navbar-expand-lg navbar-light bg-light nav-bottom">
                 <div className="container">
                     <Link to='/' className="navbar-brand swoosh-brand">
                         <span className="swoosh-text titan-one-regular">آرمان</span>
                     </Link>
-
                     <div className="navbar-nav d-none d-lg-flex">
                         <Link to="/" className="nav-link">Home</Link>
                         <div className="nav-item dropdown">
@@ -63,14 +53,13 @@ function MyNav() {
                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                 {categories.map((category, index) => (
                                     <li key={index}>
-                                        <Link className="dropdown-item" to={`/category/${category}`}>{category}</Link>
+                                        <Link className="dropdown-item" to={`/category/${category.category}`}>{category.category}</Link>
                                     </li>
                                 ))}
                             </ul>
                         </div>
                         <Link to='/about-us' className="nav-link">About Us</Link>
                     </div>
-
                     <div className="d-flex align-items-center">
                         <div className="sidebar-toggle mx-2" onClick={toggleSidebar}>
                             <h4><FiMenu /></h4>
@@ -104,13 +93,13 @@ function MyNav() {
                                     {categories.map((category, index) => (
                                         <Link
                                             key={index}
-                                            to={`/category/${category}`}
+                                            to={`/category/${category.category}`}
                                             onClick={() => {
                                                 toggleSidebar();
                                                 setIsCategoryOpen(false);
                                             }}
                                         >
-                                            {category}
+                                            {category.category}
                                         </Link>
                                     ))}
                                 </div>

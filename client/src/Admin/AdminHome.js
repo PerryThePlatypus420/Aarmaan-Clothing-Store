@@ -91,7 +91,7 @@ const AdminDashboard = ({ setSection }) => {
             {/* Centered, Larger Cards Section */}
             <div className="row justify-content-center">
                 {cards.map((card, index) => (
-                    <div key={index} className="col-md-4 mb-4">
+                    <div key={index} className="col-md-4 custom-padding">
                         <div className="card-custom" onClick={() => setSection(card.title)}>
                             <div className="card-body text-center">
                                 <h2 className="card-title">{card.title}</h2>

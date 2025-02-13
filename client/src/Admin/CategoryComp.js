@@ -7,10 +7,9 @@ const CategoryComp = ({ onBack }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [newCategory, setNewCategory] = useState({ category: "", img: "" });
+    const [imageFile, setImageFile] = useState(null);
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
+    useEffect(() => { fetchCategories(); }, []);
 
     const fetchCategories = () => {
         fetch("http://localhost:3001/api/categories")
@@ -19,110 +18,140 @@ const CategoryComp = ({ onBack }) => {
             .catch(error => console.error("Error fetching categories:", error));
     };
 
-    const openAddModal = () => {
-        setNewCategory({ category: "", img: "" });
-        setSelectedCategory(null);
-        setIsEditing(false);
-        setShowModal(true);
+    const convertImg = (base64String) => {
+        // If the image is already in base64 format, return it directly
+        if (typeof base64String === 'string' && base64String.startsWith('data:image')) {
+            return base64String;
+        }
+        return null;
+    };
+    
+    const openAddModal = () => { 
+        setNewCategory({ category: "", img: "" }); 
+        setSelectedCategory(null); 
+        setIsEditing(false); 
+        setShowModal(true); 
+        setImageFile(null);
     };
 
-    const openEditModal = (category) => {
-        setSelectedCategory(category);
-        setNewCategory(category);
-        setIsEditing(false);
-        setShowModal(true);
+   
+    const handleInputChange = (e) => { 
+        const { name, value } = e.target; 
+        setNewCategory({ ...newCategory, [name]: value }); 
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewCategory({ ...newCategory, [name]: value });
-    };
+    // Update the handleImageUpload function
+const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setNewCategory({ ...newCategory, img: reader.result });
+        };
+        reader.readAsDataURL(file);
+        setImageFile(file);
+    }
+};
+
+// Update the openEditModal function
+const openEditModal = (category) => {
+    setSelectedCategory(category);
+    setNewCategory({
+        ...category,
+        img: category.img // The image is already in base64 format from the backend
+    });
+    setIsEditing(false);
+    setShowModal(true);
+    setImageFile(null);
+};
 
     const addCategory = () => {
+        const formData = new FormData();
+        formData.append("category", newCategory.category);
+        if (imageFile) {
+            formData.append("img", imageFile);
+        }
+
         fetch("http://localhost:3001/api/categories/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newCategory),
+            method: "POST", 
+            body: formData,
         })
             .then(response => response.json())
-            .then(() => {
-                fetchCategories();
-                setShowModal(false);
+            .then(() => { 
+                fetchCategories(); 
+                setShowModal(false); 
             })
             .catch(error => console.error("Error adding category:", error));
     };
 
     const updateCategory = () => {
+        const formData = new FormData();
+        formData.append("category", newCategory.category);
+        if (imageFile) {
+            formData.append("img", imageFile);
+        }
+
         fetch(`http://localhost:3001/api/categories/edit/${selectedCategory._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newCategory),
+            method: "PUT", 
+            body: formData,
         })
             .then(response => response.json())
-            .then(() => {
-                fetchCategories();
-                setShowModal(false);
+            .then(() => { 
+                fetchCategories(); 
+                setShowModal(false); 
             })
             .catch(error => console.error("Error updating category:", error));
     };
 
-    const openDeleteModal = () => {
-        setShowModal(false);
-        setShowDeleteModal(true);
-    };
-
+    const openDeleteModal = () => { setShowModal(false); setShowDeleteModal(true); };
     const deleteCategory = () => {
-        fetch(`http://localhost:3001/api/categories/delete/${selectedCategory._id}`, {
-            method: "DELETE",
-        })
-            .then(() => {
-                fetchCategories();
-                setShowDeleteModal(false);
+        fetch(`http://localhost:3001/api/categories/delete/${selectedCategory._id}`, { method: "DELETE" })
+            .then(() => { 
+                fetchCategories(); 
+                setShowDeleteModal(false); 
             })
             .catch(error => console.error("Error deleting category:", error));
     };
 
+    const renderImage = (imageData) => {
+        if (!imageData) return null;
+        
+        try {
+            // If it's already a valid data URL, return it
+            if (imageData.startsWith('data:image')) {
+                return imageData;
+            }
+            return null;
+        } catch (error) {
+            console.error('Error rendering image:', error);
+            return null;
+        }
+    };
+
+
     return (
         <div className="container mt-4">
-
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <button className="btn btn-secondary" onClick={onBack}>Back to Dashboard</button>
-
-                <h2 className="text-center">Category Management</h2>
-
-                <button className="btn btn-primary" onClick={openAddModal}>Add Category</button>
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
+                <button className="btn btn-secondary mb-2 mb-sm-0" onClick={onBack}>Back to Dashboard</button>
+                <h2 className="text-center flex-grow-1 mb-2 order-h1 mb-sm-0">Category Management</h2>
+                <button className="btn btn-primary order-h1" onClick={openAddModal}>Add Category</button>
             </div>
 
-            <div className="table-responsive">
-                <table className="table table-bordered border-dark text-center">
-                    <thead className="table-dark">
-                        <tr>
-                            <th className="table-header">Image</th>
-                            <th className="table-header">Category Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {categories.length > 0 ? (
-                            categories.map(category => (
-                                <tr
-                                    key={category._id}
-                                    onClick={() => openEditModal(category)}
-                                    className="category-row"
-                                    style={{ cursor: "pointer", backgroundColor: "rgba(112, 112, 112, 0.2)"  }}
-                                >
-                                    <td className="align-middle">
-                                        <img src={category.img} alt={category.category} className="category-image" />
-                                    </td>
-                                    <td className="align-middle">{category.category}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="2" className="text-center">No categories found</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            <div className="row g-3 mt-3 mb-4">
+                {categories.length > 0 ? (
+                    categories.map(category => (
+                        <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={category._id}>
+                            <div className="card h-100 shadow-sm" style={{ cursor: "pointer", backgroundColor: "rgba(133, 133, 133, 0.42)" }} onClick={() => openEditModal(category)}>
+                                <img src={renderImage(category.img)} className="card-img-top" alt={category.category} style={{ objectFit: "cover", height: "200px" }} />
+                                <div className="card-body d-flex justify-content-center align-items-center">
+                                    <h5 className="card-title text-center">{category.category}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-12 text-center"><p>No categories found</p></div>
+                )}
             </div>
 
             {showModal && (
@@ -146,15 +175,19 @@ const CategoryComp = ({ onBack }) => {
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label">Image URL</label>
+                                    <label className="form-label">Image</label>
                                     <input
-                                        type="text"
+                                        type="file"
                                         className="form-control"
-                                        name="img"
-                                        value={newCategory.img}
-                                        onChange={handleInputChange}
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
                                         disabled={selectedCategory && !isEditing}
                                     />
+                                    {newCategory.img && (
+                                        <div className="mt-2">
+                                            <img src={newCategory.img} alt="Preview" style={{ maxWidth: "100%", height: "auto" }} />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="modal-footer">

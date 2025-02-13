@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import './NewCollection.css';
+import React, { useState, useEffect } from"react";
+import './HomepageProducts.css';
 import ProductCard from "./ProductCard";
 import { ThreeDots } from "react-loader-spinner";
 
-function NewCollection() {
+function HomePageProducts() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchSummerCollection = async () => {
+        const fetchHomeProducts = async () => {
             try {
-                const response = await fetch(process.env.REACT_APP_API + '/api/summerCollection');
+                const response = await fetch('http://localhost:3001/api/homepage-products');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -24,7 +24,7 @@ function NewCollection() {
             }
         };
 
-        fetchSummerCollection();
+        fetchHomeProducts();
     }, []);
 
     if (loading) return <div className="d-flex justify-content-center align-items-center vh-100">
@@ -69,4 +69,4 @@ function NewCollection() {
     );
 }
 
-export default NewCollection;
+export default HomePageProducts;

@@ -19,7 +19,7 @@ function Product() {
   React.useEffect(() => {
     const fetchProduct = async () => {
       const response = await fetch(
-        process.env.REACT_APP_API + `/api/products/${id}`
+        `http://localhost:3001/api/products/${id}`
       );
       const data = await response.json();
       setProduct(data);

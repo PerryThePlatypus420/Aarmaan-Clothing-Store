@@ -1,7 +1,6 @@
 import React from "react";
 import Categories from '../components/Categories';
-import NewCollection from '../components/NewCollection';
-
+import HomePageProducts from "../components/HomepageProducts";
 
 function Home() {
 
@@ -10,7 +9,7 @@ function Home() {
         <>
             
             <Categories />
-            <NewCollection />
+            <HomePageProducts />
         </>
     );
 }

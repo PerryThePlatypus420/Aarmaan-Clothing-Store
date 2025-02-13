@@ -67,13 +67,13 @@ const OrdersComp = ({ onBack }) => {
 
     return (
         <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-3 top-bar">
                 <button className="btn btn-secondary" onClick={onBack}>Back to Dashboard</button>
 
-                <h2 className="text-center"> {filter} Orders</h2>
+                <h2 className="text-center order-h1"> {filter} Orders</h2>
 
                 {/* Filter Dropdown */}
-                <div>
+                <div className="order-filter">
                     <label className="me-2 fw-bold">Filter:</label>
                     <select className="form-select d-inline-block w-auto" value={filter} onChange={(e) => setFilter(e.target.value)}>
                         <option value="All">All</option>

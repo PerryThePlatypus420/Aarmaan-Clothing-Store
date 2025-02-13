@@ -51,7 +51,7 @@ function Login() {
             return;
         }
         try {
-            const endpoint = activeTab === 'login' ? process.env.REACT_APP_API + '/api/users/login' : process.env.REACT_APP_API + '/api/users/register';
+            const endpoint = activeTab === 'login' ? 'http://localhost:3001/api/users/login' : 'http://localhost:3001/api/users/register';
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {

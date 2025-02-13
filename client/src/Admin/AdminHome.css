@@ -66,3 +66,18 @@
     object-fit: cover;
     border-radius: 5px;
 }
+
+@media screen and (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .custom-padding{
+        padding: 10px;
+    }
+
+    .order-h1{
+        margin: 10px 0;
+    }
+}
