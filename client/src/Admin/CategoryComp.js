@@ -137,7 +137,7 @@ const openEditModal = (category) => {
                 <button className="btn btn-primary order-h1" onClick={openAddModal}>Add Category</button>
             </div>
 
-            <div className="row g-3 mt-3 mb-4">
+            <div className="row g-3 mt-4 mb-4">
                 {categories.length > 0 ? (
                     categories.map(category => (
                         <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={category._id}>
