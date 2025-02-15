@@ -13,14 +13,28 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    img: {
+    images: [{
+        type: Buffer,
+        required: true
+    }],
+    description: {
         type: String,
         required: true
     },
-    description: {
-        type: Object,
+    design_details: {
+        type: String,
         required: true
-    }
+    },
+    sizes: [{
+        size: {
+            type: String,
+            required: true
+        },
+        stock: {
+            type: Number,
+            required: true
+        }
+    }]
 });
 
 // Virtual field for id
@@ -32,7 +46,6 @@ productSchema.virtual('id').get(function () {
 productSchema.set('toJSON', {
     virtuals: true
 });
-
 
 const Product = mongoose.model('Product', productSchema);
 

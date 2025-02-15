@@ -141,7 +141,7 @@ const openEditModal = (category) => {
                 {categories.length > 0 ? (
                     categories.map(category => (
                         <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={category._id}>
-                            <div className="card h-100 shadow-sm" style={{ cursor: "pointer", backgroundColor: "rgba(133, 133, 133, 0.42)" }} onClick={() => openEditModal(category)}>
+                            <div className="card h-100" style={{ cursor: "pointer", backgroundColor: "rgba(160, 160, 160, 0.35)" }} onClick={() => openEditModal(category)}>
                                 <img src={renderImage(category.img)} className="card-img-top" alt={category.category} style={{ objectFit: "cover", height: "200px" }} />
                                 <div className="card-body d-flex justify-content-center align-items-center">
                                     <h5 className="card-title text-center">{category.category}</h5>

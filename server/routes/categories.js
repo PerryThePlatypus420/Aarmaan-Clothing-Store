@@ -6,7 +6,7 @@ const multer = require("multer");
 // Multer configuration for image upload
 const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
-    const validTypes = ['image/jpeg', 'image/png'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
     if (validTypes.includes(file.mimetype)) {
         cb(null, true); // Accept the file
     } else {
