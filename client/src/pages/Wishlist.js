@@ -63,21 +63,22 @@ function Wishlist() {
         <>
             <h1 className='mt-5 mb-4'>Wishlist</h1>
 
-            <div className="container my-5">
+            <div className="container">
                 <div className='row my-4'>
                     {
                         products.length === 0 && <h3>Your wishlist is empty</h3>
                     }
-                    {products.map(product => (
-                        <div key={product.id} className='col-md-4 my-3'>
+                    {products.map((product, index) => (
+                        <div key={product._id || index} className='col-md-3 my-3'>
                             <ProductCard
-                                id={product.id}
+                                id={product._id}
                                 title={product.title}
                                 price={product.price}
                                 img={product.img}
                             />
                         </div>
                     ))}
+
                 </div>
                 <div className="mt-5">
                     <Link to='/' className='btn btn-dark btn-lg'>
