@@ -274,7 +274,7 @@ const ProductsComp = ({ onBack }) => {
                         />
                         <div className="card-body text-center">
                             <h5 className="card-title fw-bold">{product.title}</h5>
-                            <p className="card-text text-success fw-bold">${product.price}</p>
+                            <p className="card-text text-success fw-bold">Rs. {product.price}</p>
                         </div>
                     </div>
                 ))}
