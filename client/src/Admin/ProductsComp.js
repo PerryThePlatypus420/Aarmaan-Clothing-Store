@@ -217,13 +217,13 @@ const ProductsComp = ({ onBack }) => {
 
     return (
         <div className="p-2">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <button className="btn btn-secondary border mb-0" onClick={onBack}>
+            <div className="d-flex justify-content-between align-items-center mb-4 top-bar">
+                <button className="btn btn-secondary border mb-2" onClick={onBack}>
                     BACK TO DASHBOARD
                 </button>
-                <h2 className="fw-normal mb-0">Product Management</h2>
+                <h2 className="fw-normal mb-2">Product Management</h2>
                 <div className="d-flex align-items-center">
-                    <span className="me-2 fw-bold">Filter:</span>
+                    <span className="me-2 fw-bold mb-2">Filter:</span>
                     <select
                         className="form-select border"
                         onChange={(e) => setSelectedCategory(e.target.value)}
@@ -274,6 +274,7 @@ const ProductsComp = ({ onBack }) => {
                         />
                         <div className="card-body text-center">
                             <h5 className="card-title fw-bold">{product.title}</h5>
+                            <p className="card-text">Category: {product.category}</p>
                             <p className="card-text text-success fw-bold">Rs. {product.price}</p>
                         </div>
                     </div>
