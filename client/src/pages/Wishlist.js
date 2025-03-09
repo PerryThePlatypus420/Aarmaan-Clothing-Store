@@ -20,7 +20,6 @@ function Wishlist() {
                     setProducts([]);
                     return;
                 }
-
                 const response = await fetch('http://localhost:3001/api/products/ids', {
                     method: 'POST',
                     headers: {

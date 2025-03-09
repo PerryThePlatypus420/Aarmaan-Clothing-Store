@@ -54,6 +54,7 @@
 .add-to-cart-btn {
   width: 100%;
   padding: 0.5rem;
+  margin:auto;
   background-color: #333333;
   color: white;
   border: none;
@@ -73,9 +74,29 @@
 }
 
 .heart-cont {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   position: relative;
+  cursor: pointer;
+  padding-top: 2px;
+}
+
+.heart-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px; /* Increased size */
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.heart-icon.outline {
+  color: gray; /* Default color */
+}
+
+.heart-icon.filled {
+  color: red;
+  transform: translate(-50%, -50%) scale(1.1); /* Slightly pop effect */
 }
 
 .heart-cont > * {

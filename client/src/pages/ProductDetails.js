@@ -4,13 +4,12 @@ import { CartContext } from "../cartContext";
 import { useContext } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import { WishlistContext } from "../wishlistContext";
-import Heart from "react-animated-heart";
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { ThreeDots } from "react-loader-spinner";
 
 function Product() {
   const { addItemToCart } = useContext(CartContext);
   const { toggleItemInWishlist, isInWishlist } = useContext(WishlistContext);
-
   const { id } = useParams();
 
   const [loading, setLoading] = React.useState(true);
@@ -18,9 +17,7 @@ function Product() {
 
   React.useEffect(() => {
     const fetchProduct = async () => {
-      const response = await fetch(
-        `http://localhost:3001/api/products/${id}`
-      );
+      const response = await fetch(`http://localhost:3001/api/products/${id}`);
       const data = await response.json();
       setProduct(data);
       setLoading(false);
@@ -33,22 +30,12 @@ function Product() {
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
-        <ThreeDots
-          visible={true}
-          height="80"
-          width="80"
-          color="black"
-          radius="9"
-          ariaLabel="three-dots-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-        />
+        <ThreeDots visible={true} height="80" width="80" color="black" radius="9" />
       </div>
     );
   }
 
-  const { productDescription, fabricComposition, designDetails } =
-    product.description || {};
+  const { productDescription, fabricComposition, designDetails } = product.description || {};
 
   const handleWishlist = (e) => {
     e.preventDefault();
@@ -65,69 +52,42 @@ function Product() {
               <div id="carouselExampleControls" className="carousel slide">
                 <div className="carousel-inner">
                   {product.img.map((image, index) => (
-                    <div
-                      className={`carousel-item ${
-                        index === 0 ? "active" : ""
-                      }`}
-                      key={index}
-                    >
-                      <img
-                        src={image}
-                        className="d-block w-100"
-                        alt="Product-Image"
-                        style={{
-                          maxHeight: "500px",
-                          objectFit: "contain",
-                        }} // Changed to 'contain' for full image visibility
-                      />
+                    <div className={`carousel-item ${index === 0 ? "active" : ""}`} key={index}>
+                      <img src={image} className="d-block w-100" alt="Product-Image"
+                        style={{ maxHeight: "500px", objectFit: "contain" }} />
                     </div>
                   ))}
                 </div>
-                <button
-                  style={{ color: "grey" }}
-                  className="carousel-control-prev"
-                  type="button"
-                  data-bs-target="#carouselExampleControls"
-                  data-bs-slide="prev"
-                >
-                  <span
-                    className="carousel-control-prev-icon"
-                    aria-hidden="true"
-                  ></span>
+                <button className="carousel-control-prev" type="button"
+                  data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                   <span className="visually-hidden">Previous</span>
                 </button>
-                <button
-                  style={{ color: "grey" }}
-                  className="carousel-control-next"
-                  type="button"
-                  data-bs-target="#carouselExampleControls"
-                  data-bs-slide="next"
-                >
-                  <span
-                    className="carousel-control-next-icon"
-                    aria-hidden="true"
-                  ></span>
+                <button className="carousel-control-next" type="button"
+                  data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
                   <span className="visually-hidden">Next</span>
                 </button>
               </div>
             ) : (
-              <img
-                src={product.img}
-                alt="Product-Image"
-                className="img-fluid w-100"
-                style={{ maxHeight: "500px", objectFit: "cover" }}
-              />
+              <img src={product.img} alt="Product-Image" className="img-fluid w-100"
+                style={{ maxHeight: "500px", objectFit: "cover" }} />
             )}
           </div>
         </div>
+        
         {/* Product Details */}
         <div className="col-md-6 d-flex flex-column justify-content-between">
           <div className="d-flex flex-column justify-content-center gap-4">
             {/* Product Title */}
             <h1 className="h3 fw-bold text-black d-flex align-items-center justify-content-between">
               {product.title}
-              <div className="heart-cont ms-2">
-                <Heart isClick={isInWishlist(id)} onClick={handleWishlist} />
+              <div className="heart-cont ms-2" onClick={handleWishlist}>
+                {isInWishlist(id) ? (
+                  <IoHeart className="heart-icon filled" />
+                ) : (
+                  <IoHeartOutline className="heart-icon outline" />
+                )}
               </div>
             </h1>
 
@@ -143,9 +103,7 @@ function Product() {
                 <b>Fabric Composition: </b>
                 <ul>
                   {Object.entries(fabricComposition).map(([key, value]) => (
-                    <li key={key}>
-                      {key}: {value}
-                    </li>
+                    <li key={key}>{key}: {value}</li>
                   ))}
                 </ul>
               </div>
@@ -155,18 +113,15 @@ function Product() {
                 <b>Design Details: </b>
                 <ul>
                   {Object.entries(designDetails).map(([key, value]) => (
-                    <li key={key}>
-                      {key}: {value}
-                    </li>
+                    <li key={key}>{key}: {value}</li>
                   ))}
                 </ul>
               </div>
             )}
             {/* Product Price */}
-            <span className="h4 fw-bold text-black">
-              Rs. {product.price}
-            </span>
+            <span className="h4 fw-bold text-black">Rs. {product.price}</span>
           </div>
+
           {/* Quantity Input and Order Button */}
           <div className="mt-4">
             <div className="mb-3">
@@ -174,21 +129,12 @@ function Product() {
               <div className="d-flex flex-row align-items-center justify-content-between gap-3">
                 <label className="fw-bold">Quantity</label>
                 {/* Quantity Input */}
-                <input
-                  className="form-control"
-                  type="number"
-                  min="1"
-                  required
-                  onChange={(e) => setItems(e.target.value)}
-                  value={items}
-                  style={{ maxWidth: "100px" }}
-                />
+                <input className="form-control" type="number" min="1" required
+                  onChange={(e) => setItems(e.target.value)} value={items}
+                  style={{ maxWidth: "100px" }} />
                 {/* Order Button */}
-                <button
-                  className="btn btn-dark d-flex justify-content-center align-items-center gap-2 flex-grow-1"
-                  title="Confirm Order"
-                  onClick={() => addItemToCart(id, items)}
-                >
+                <button className="btn btn-dark d-flex justify-content-center align-items-center gap-2 flex-grow-1"
+                  title="Confirm Order" onClick={() => addItemToCart(id, items)}>
                   <FaCartPlus /> <span>Add to Cart</span>
                 </button>
               </div>
