@@ -1,6 +1,5 @@
 import React from "react";
 import './Footer.css';
-import swooshLogoWhite from '../assets/swoosh-logo-white.png';
 
 
 function Footer() {
