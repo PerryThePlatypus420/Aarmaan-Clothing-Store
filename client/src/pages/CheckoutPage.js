@@ -8,7 +8,7 @@ import { ThreeDots } from "react-loader-spinner";
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Checkout() {
-    const { cart } = useContext(CartContext);
+    const { cart, resetCart } = useContext(CartContext);
     const { settings, loading: settingsLoading } = useSettings();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
@@ -95,14 +95,19 @@ export default function Checkout() {
                     body: JSON.stringify(orderData)
                 });
 
+                const result = await response.json();
+
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    // Handle stock validation errors and other server errors
+                    throw new Error(result.error || 'Network response was not ok');
                 }
 
-                const result = await response.json();
                 console.log(result.message);
+                // Clear the cart after successful order
+                resetCart();
                 navigate('/completed');
             } catch (error) {
+                // Display specific error message from server (e.g., stock validation errors)
                 alert('Failed to submit order: ' + error.message);
             }
         } else {

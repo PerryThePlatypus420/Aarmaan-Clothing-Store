@@ -21,6 +21,31 @@ router.post('/create', async (req, res) => {
       totalAmount
     } = req.body;
 
+    // First, validate stock availability for all products
+    for (const orderProduct of products) {
+      const product = await Product.findById(orderProduct.productId);
+      if (!product) {
+        return res.status(400).json({ error: `Product with ID ${orderProduct.productId} not found` });
+      }
+
+      // Check if product has sizes and if a specific size was ordered
+      if (orderProduct.size && product.sizes && product.sizes.length > 0) {
+        const sizeInfo = product.sizes.find(s => s.size === orderProduct.size);
+        if (!sizeInfo) {
+          return res.status(400).json({ error: `Size ${orderProduct.size} not available for product ${product.title}` });
+        }
+        if (sizeInfo.stock < orderProduct.quantity) {
+          return res.status(400).json({ error: `Insufficient stock for product ${product.title} in size ${orderProduct.size}. Available: ${sizeInfo.stock}, Requested: ${orderProduct.quantity}` });
+        }
+      } else {
+        // Check general stock
+        if (product.stock < orderProduct.quantity) {
+          return res.status(400).json({ error: `Insufficient stock for product ${product.title}. Available: ${product.stock}, Requested: ${orderProduct.quantity}` });
+        }
+      }
+    }
+
+    // Create the order
     const order = new Order({
       firstName,
       lastName,
@@ -34,7 +59,26 @@ router.post('/create', async (req, res) => {
     });
 
     await order.save();
-    res.status(201).json({ message: 'Order created successfully', order });
+
+    // Update stock for all products after successful order creation
+    for (const orderProduct of products) {
+      const product = await Product.findById(orderProduct.productId);
+      
+      if (orderProduct.size && product.sizes && product.sizes.length > 0) {
+        // Update size-specific stock
+        const sizeIndex = product.sizes.findIndex(s => s.size === orderProduct.size);
+        if (sizeIndex !== -1) {
+          product.sizes[sizeIndex].stock -= orderProduct.quantity;
+        }
+      } else {
+        // Update general stock
+        product.stock -= orderProduct.quantity;
+      }
+
+      await product.save();
+    }
+
+    res.status(201).json({ message: 'Order created successfully and stock updated', order });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create order' });

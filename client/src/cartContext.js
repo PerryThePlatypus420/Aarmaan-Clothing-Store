@@ -188,7 +188,7 @@ export const CartProvider = ({ children }) => {
     }
 
     return (
-        <CartContext.Provider value={{ cart, addItemToCart, removeItemFromCart }}>
+        <CartContext.Provider value={{ cart, setCart, addItemToCart, removeItemFromCart, resetCart }}>
             <ToastContainer
                 position="bottom-right"
                 autoClose={2000}

@@ -89,7 +89,7 @@ function Product() {
                       <img 
                         src={image} 
                         className="d-block w-100" 
-                        alt="Product Image"
+                        alt={`${product.title} - View ${index + 1}`}
                         style={{ 
                           height: "500px", 
                           objectFit: "cover",
@@ -125,7 +125,7 @@ function Product() {
             ) : (
               <img 
                 src={product.images?.[0]} 
-                alt="Product Image" 
+                alt={product.title || "Product"} 
                 className="img-fluid w-100"
                 style={{ 
                   height: "500px", 

@@ -242,4 +242,63 @@ router.post('/ids', async (req, res) => {
     }
 });
 
+// ✅ Check stock availability for products
+router.post('/check-stock', async (req, res) => {
+    try {
+        const { products } = req.body;
+        if (!Array.isArray(products)) {
+            return res.status(400).json({ message: 'Invalid products array' });
+        }
+
+        const stockCheck = [];
+        
+        for (const orderProduct of products) {
+            const product = await Product.findById(orderProduct.productId);
+            if (!product) {
+                stockCheck.push({
+                    productId: orderProduct.productId,
+                    available: false,
+                    reason: 'Product not found'
+                });
+                continue;
+            }
+
+            // Check size-specific stock if size is specified
+            if (orderProduct.size && product.sizes && product.sizes.length > 0) {
+                const sizeInfo = product.sizes.find(s => s.size === orderProduct.size);
+                if (!sizeInfo) {
+                    stockCheck.push({
+                        productId: orderProduct.productId,
+                        size: orderProduct.size,
+                        available: false,
+                        reason: 'Size not available'
+                    });
+                } else {
+                    stockCheck.push({
+                        productId: orderProduct.productId,
+                        size: orderProduct.size,
+                        available: sizeInfo.stock >= orderProduct.quantity,
+                        availableStock: sizeInfo.stock,
+                        requestedQuantity: orderProduct.quantity,
+                        reason: sizeInfo.stock >= orderProduct.quantity ? 'Available' : 'Insufficient stock'
+                    });
+                }
+            } else {
+                // Check general stock
+                stockCheck.push({
+                    productId: orderProduct.productId,
+                    available: product.stock >= orderProduct.quantity,
+                    availableStock: product.stock,
+                    requestedQuantity: orderProduct.quantity,
+                    reason: product.stock >= orderProduct.quantity ? 'Available' : 'Insufficient stock'
+                });
+            }
+        }
+
+        res.json({ stockCheck });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
