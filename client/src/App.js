@@ -9,6 +9,7 @@ import Cart from './pages/Cart';
 import NotFound from './pages/NotFound';
 import { CartProvider } from './cartContext';
 import { WishlistProvider } from './wishlistContext';
+import { SettingsProvider } from './settingsContext';
 import Wishlist from './pages/Wishlist';
 import CheckoutPage from './pages/CheckoutPage';
 import Completed from './pages/Completed';
@@ -17,18 +18,21 @@ import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import AdminHome from './Admin/AdminHome';
 import { UserProvider } from './userContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
 
   return (
     <UserProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <BrowserRouter>
-            <MainLayout />
-          </BrowserRouter>
-        </WishlistProvider>
-      </CartProvider>
+      <SettingsProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <BrowserRouter>
+              <MainLayout />
+            </BrowserRouter>
+          </WishlistProvider>
+        </CartProvider>
+      </SettingsProvider>
     </UserProvider>
   );
 };
@@ -50,7 +54,11 @@ const MainLayout = () => {
         <Route path='/checkout' element={<CheckoutPage />} />
         <Route path='/completed' element={<Completed />} />
         <Route path='/about-us' element={<AboutUs />} />
-        <Route path='/admin' element={<AdminHome />} />
+        <Route path='/admin' element={
+          <ProtectedRoute>
+            <AdminHome />
+          </ProtectedRoute>
+        } />
         <Route path='/*' element={<NotFound />} />
       </Routes>
       {!isAdminRoute && <Footer />}

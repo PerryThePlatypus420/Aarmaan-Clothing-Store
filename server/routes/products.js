@@ -3,6 +3,7 @@ const router = express.Router();
 const Product = require('../models/Product');
 const HomeProducts = require('../models/HomepageProducts');
 const multer = require('multer');
+const { authenticateAdmin } = require('./auth');
 
 // Multer configuration for multiple image uploads
 const storage = multer.memoryStorage();
@@ -68,10 +69,10 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// In products.js - Update the add route
-router.post('/add', upload.array('images', 10), async (req, res) => {
+// In products.js - Update the add route (admin only)
+router.post('/add', authenticateAdmin, upload.array('images', 10), async (req, res) => {
     try {
-        const { title, price, category, description, design_details, sizes, homepage } = req.body;
+        const { title, price, category, description, design_details, sizes, homepage, stock } = req.body;
         const images = req.files ? req.files.map(file => Buffer.from(file.buffer)) : [];
 
         // Validate sizes
@@ -90,6 +91,7 @@ router.post('/add', upload.array('images', 10), async (req, res) => {
             design_details,
             sizes: parsedSizes,
             images,
+            stock: parsedSizes.length === 0 ? (stock || 0) : 0, // Only use stock if no sizes
         });
 
         const savedProduct = await newProduct.save();
@@ -120,10 +122,10 @@ router.post('/add', upload.array('images', 10), async (req, res) => {
     }
 });
 
-// In products.js - Update the edit route
-router.put('/edit/:id', upload.array('images', 10), async (req, res) => {
+// In products.js - Update the edit route (admin only)
+router.put('/edit/:id', authenticateAdmin, upload.array('images', 10), async (req, res) => {
     try {
-        const { title, price, category, description, design_details, sizes, homepage, keptImageIndexes } = req.body;
+        const { title, price, category, description, design_details, sizes, homepage, keptImageIndexes, stock } = req.body;
         const newImages = req.files ? req.files.map(file => Buffer.from(file.buffer)) : [];
 
         // Validate sizes
@@ -159,7 +161,9 @@ router.put('/edit/:id', upload.array('images', 10), async (req, res) => {
             design_details,
             sizes: parsedSizes,
             // Combine kept existing images with new images
-            images: [...keptImages, ...newImages]
+            images: [...keptImages, ...newImages],
+            // Only update stock if no sizes are present
+            ...(parsedSizes.length === 0 ? { stock: stock || 0 } : {})
         };
 
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -194,8 +198,8 @@ router.put('/edit/:id', upload.array('images', 10), async (req, res) => {
     }
 });
 
-// ✅ Delete a product (removes from homepage too)
-router.delete('/delete/:id', async (req, res) => {
+// ✅ Delete a product (removes from homepage too) (admin only)
+router.delete('/delete/:id', authenticateAdmin, async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
         if (!deletedProduct) {
@@ -215,8 +219,13 @@ router.delete('/delete/:id', async (req, res) => {
 router.post('/ids', async (req, res) => {
     try {
         const ids = req.body.ids;
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ message: 'Invalid or empty IDs array' });
+        if (!Array.isArray(ids)) {
+            return res.status(400).json({ message: 'Invalid IDs array' });
+        }
+
+        // Return empty array if no IDs provided
+        if (ids.length === 0) {
+            return res.json([]);
         }
 
         const products = await Product.find({ '_id': { $in: ids } });

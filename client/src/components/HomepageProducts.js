@@ -3,6 +3,8 @@ import './HomepageProducts.css';
 import ProductCard from "./ProductCard";
 import { ThreeDots } from "react-loader-spinner";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function HomePageProducts() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -11,12 +13,12 @@ function HomePageProducts() {
     useEffect(() => {
         const fetchHomeProducts = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/homepage-products');
+                const response = await fetch(`${API_URL}/api/homepage-products`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                setProducts(data.map(item => item.productID));
+                setProducts(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -53,12 +55,12 @@ function HomePageProducts() {
                         <h3>No products found</h3>
                     ) : (
                         products.map(product => (
-                            <div key={product.id} className="col-md-3 my-3">
+                            <div key={product._id} className="col-md-3 my-3">
                                 <ProductCard 
-                                    id={product.id} 
+                                    id={product._id} 
                                     title={product.title} 
                                     price={product.price} 
-                                    img={product.img} 
+                                    imgs={product.images} 
                                 />
                             </div>
                         ))

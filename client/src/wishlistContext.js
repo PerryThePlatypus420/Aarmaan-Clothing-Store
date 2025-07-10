@@ -3,7 +3,17 @@ import { useState, createContext, useEffect } from 'react';
 export const WishlistContext = createContext(null);
 
 export const WishlistProvider = ({ children }) => {
-    const [wishlist, setWishlist] = useState(JSON.parse(localStorage.getItem('wishlist')) || {});
+    const [wishlist, setWishlist] = useState(() => {
+        const savedWishlist = JSON.parse(localStorage.getItem('wishlist')) || {};
+        // Clean up invalid keys
+        const cleanedWishlist = {};
+        Object.keys(savedWishlist).forEach(key => {
+            if (key && key !== 'undefined' && key !== null && key !== '' && key !== undefined && key.trim() !== '') {
+                cleanedWishlist[key] = savedWishlist[key];
+            }
+        });
+        return cleanedWishlist;
+    });
 
     useEffect(() => {
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
@@ -11,6 +21,12 @@ export const WishlistProvider = ({ children }) => {
     }, [wishlist]);
 
     const toggleItemInWishlist = (productId) => {
+        // Validate productId before proceeding
+        if (!productId || productId === 'undefined' || productId === undefined || productId === null || productId === '' || typeof productId !== 'string') {
+            console.error('Invalid productId in wishlist:', productId);
+            return;
+        }
+        
         if (wishlist[productId]) {
             removeItemFromWishlist(productId);
         } else {
@@ -19,11 +35,23 @@ export const WishlistProvider = ({ children }) => {
     };
 
     const addItemToWishlist = (productId) => {
+        // Validate productId before proceeding
+        if (!productId || productId === 'undefined' || productId === undefined || productId === null || productId === '' || typeof productId !== 'string') {
+            console.error('Invalid productId in addItemToWishlist:', productId);
+            return;
+        }
+        
         setWishlist({ ...wishlist, [productId]: true });
         console.log('Product added to wishlist');
     };
 
     const removeItemFromWishlist = (productId) => {
+        // Validate productId before proceeding
+        if (!productId || productId === 'undefined' || productId === undefined || productId === null || productId === '' || typeof productId !== 'string') {
+            console.error('Invalid productId in removeItemFromWishlist:', productId);
+            return;
+        }
+        
         const newWishlist = { ...wishlist };
         delete newWishlist[productId];
         setWishlist(newWishlist);
@@ -31,6 +59,10 @@ export const WishlistProvider = ({ children }) => {
     };
 
     const isInWishlist = (productId) => {
+        // Validate productId before checking
+        if (!productId || productId === 'undefined' || productId === undefined || productId === null || productId === '' || typeof productId !== 'string') {
+            return false;
+        }
         return !!wishlist[productId];
     };
 

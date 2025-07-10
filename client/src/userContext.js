@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            fetch(process.env.REACT_APP_API + '/api/users/me', {
+            fetch(process.env.REACT_APP_API_URL + '/api/users/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

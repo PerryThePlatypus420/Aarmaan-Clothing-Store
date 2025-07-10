@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import CartProductCard from '../components/CartProductCard';
 import { CartContext } from '../cartContext';
+import { useSettings } from '../settingsContext';
 import { Link } from 'react-router-dom';
 import { ThreeDots } from "react-loader-spinner";
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Cart() {
   const { cart } = useContext(CartContext);
+  const { settings, loading: settingsLoading } = useSettings();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,28 +17,41 @@ function Cart() {
   useEffect(() => {
     const fetchCartProducts = async () => {
       try {
-        const productIds = Object.keys(cart).filter(id => id !== 'count');
-        if (productIds.length === 0) {
+        // Extract unique product IDs from cart items
+        const productIds = Object.values(cart.items || {})
+          .map(item => item && item.productId ? item.productId : null)
+          .filter(id => id && typeof id === 'string' && id.trim() !== '' && id !== 'undefined');
+
+        const uniqueProductIds = [...new Set(productIds)];
+
+        console.log('Cart items:', cart.items);
+        console.log('Unique product IDs:', uniqueProductIds);
+
+        if (uniqueProductIds.length === 0) {
           setLoading(false);
           setProducts([]);
           return;
         }
 
-        const response = await fetch('http://localhost:3001/api/products/ids', {
+        const response = await fetch(`${API_URL}/api/products/ids`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ ids: productIds })
+          body: JSON.stringify({ ids: uniqueProductIds })
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const errorText = await response.text();
+          console.error('Server response:', errorText);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Fetched products:', data);
         setProducts(data);
       } catch (err) {
+        console.error('Error fetching cart products:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -46,11 +62,18 @@ function Cart() {
   }, [cart]);
 
   const total = products.reduce((acc, product) => {
-    const quantity = cart[product.id];
-    return acc + product.price * quantity;
+    // Find all cart items for this product
+    const productItems = Object.values(cart.items || {}).filter(item => item.productId === product._id);
+    const productTotal = productItems.reduce((sum, item) => {
+      if (item.quantity && typeof item.quantity === 'number' && item.quantity > 0) {
+        return sum + product.price * item.quantity;
+      }
+      return sum;
+    }, 0);
+    return acc + productTotal;
   }, 0);
 
-  if (loading) return <div className="d-flex justify-content-center align-items-center vh-100">
+  if (loading || settingsLoading) return <div className="d-flex justify-content-center align-items-center vh-100">
     <ThreeDots
       visible={true}
       height="80"
@@ -65,47 +88,123 @@ function Cart() {
   if (error) return <h3>Error: {error}</h3>;
 
   return (
-    <div className="cart mt-5">
-      <h1 className='mb-5'>Cart</h1>
-      <div className='row'>
-        {
-          cart.count === 0 && <h3>Your cart is empty</h3>
-        }
-        {products.map(product => (
-          <div className='col-md-8 col-sm-10 offset-md-2 offset-sm-1 mb-3' key={product.id}>
-            <CartProductCard
-              id={product.id}
-              title={product.title}
-              price={product.price}
-              img={product.img}
-              count={cart[product.id]}
-            />
+    <div className="container-fluid px-3 px-md-4 py-4">
+      <div className="row justify-content-center">
+        <div className="col-12 col-lg-10 col-xl-8">
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <h1 className='h2 fw-bold text-dark mb-0'>Shopping Cart</h1>
+            {cart.count > 0 && (
+              <span className="badge bg-primary fs-6 px-3 py-2 rounded-pill">
+                {cart.count} {cart.count === 1 ? 'item' : 'items'}
+              </span>
+            )}
           </div>
-        ))}
+          
+          {(!cart.count || cart.count === 0) ? (
+            <div className="text-center py-5">
+              <div className="mb-4">
+                <i className="bi bi-cart-x display-1 text-muted"></i>
+              </div>
+              <h3 className="text-muted mb-3">Your cart is empty</h3>
+              <p className="text-muted mb-4">Looks like you haven't added anything to your cart yet</p>
+              <Link to='/' className='btn btn-dark btn-lg px-4'>
+                Start Shopping
+              </Link>
+            </div>
+          ) : (
+            <div className='row g-4'>
+              {products.length > 0 && products.map(product => {
+                // Find all cart items for this product (different sizes)
+                const productItems = Object.entries(cart.items || {}).filter(([key, item]) =>
+                  item && item.productId === product._id
+                );
+
+                return productItems.map(([itemKey, item]) => {
+                  // Get stock for the specific size or general stock
+                  const getStockForSize = () => {
+                    if (product.sizes && product.sizes.length > 0) {
+                      const sizeObj = product.sizes.find(s => s.size === item.size);
+                      return sizeObj ? sizeObj.stock : 0;
+                    } else {
+                      return product.stock || 0;
+                    }
+                  };
+
+                  return (
+                    <div className='col-12' key={itemKey}>
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-body p-3">
+                          <CartProductCard
+                            id={product._id}
+                            title={product.title}
+                            price={product.price}
+                            img={product.images}
+                            count={item.quantity || 0}
+                            size={item.size || ''}
+                            itemKey={itemKey}
+                            stock={getStockForSize()}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                });
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
       {cart.count > 0 && (
-        <div className="card bg-light mt-3 p-3">
-          <div className="card-body">
-            <h4 className="card-title">Summary</h4>
-            <p className="card-text">Total Items: {cart.count}</p>
-            <p className="card-text">Total: Rs. {total}</p>
-            <p className="card-text">
-              {total >= 2500 ? (
-                <span className="text-success">You have got free delivery!</span>
-              ) : (
-                <span className='text-danger'>Rs. {2500 - total} to go for free delivery!</span>
-              )}
-            </p>
+        <div className="row justify-content-center mt-4">
+          <div className="col-12 col-lg-10 col-xl-8">
+            <div className="card border-0 shadow-sm bg-light">
+              <div className="card-body p-4">
+                <div className="row align-items-center">
+                  <div className="col-md-8">
+                    <h4 className="card-title fw-bold mb-3">Order Summary</h4>
+                    <div className="d-flex justify-content-between mb-2">
+                      <span className="text-muted">Total Items:</span>
+                      <span className="fw-semibold">{cart.count}</span>
+                    </div>
+                    <div className="d-flex justify-content-between mb-3">
+                      <span className="text-muted">Subtotal:</span>
+                      <span className="fw-bold fs-5">Rs. {total.toLocaleString()}</span>
+                    </div>
+                    <div className="border-top pt-3">
+                      {settings.freeDeliveryThreshold !== null ? (
+                        total >= settings.freeDeliveryThreshold ? (
+                          <div className="d-flex align-items-center text-success">
+                            <i className="bi bi-check-circle-fill me-2"></i>
+                            <span className="fw-semibold">You have got free delivery!</span>
+                          </div>
+                        ) : (
+                          <div className="d-flex align-items-center text-warning">
+                            <i className="bi bi-truck me-2"></i>
+                            <span>Rs. {(settings.freeDeliveryThreshold - total).toLocaleString()} more for free delivery</span>
+                          </div>
+                        )
+                      ) : (
+                        <div className="d-flex align-items-center text-muted">
+                          <i className="bi bi-truck me-2"></i>
+                          <span>Standard delivery charge of Rs. {settings.deliveryFee?.toLocaleString()} applies to all orders</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="col-md-4 text-md-end mt-3 mt-md-0">
+                    <Link to='/checkout' className='btn btn-dark btn-lg px-4 py-3 shadow-sm'>
+                      <i className="bi bi-arrow-right me-2"></i>
+                      Proceed to Checkout
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
-      <div className="mt-5">
-        {cart.count > 0 ? (
-          <Link to='/checkout' className='btn btn-dark btn-lg'>Checkout</Link>
-        ) : (
-          <Link to='/' className='btn btn-dark btn-lg'>Continue Shopping</Link>
-        )}
-      </div>
+
     </div>
   );
 }

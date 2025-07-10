@@ -1,36 +1,30 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
     MDBContainer,
-    MDBTabs,
-    MDBTabsItem,
-    MDBTabsLink,
     MDBBtn,
-    MDBInput,
-    MDBCheckbox
+    MDBInput
 } from 'mdb-react-ui-kit';
-import { UserContext } from '../userContext'; // Import UserContext
-import { useNavigate} from 'react-router-dom';
+import { UserContext } from '../userContext';
+import { useNavigate } from 'react-router-dom';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Login() {
-    const { login } = useContext(UserContext); // Access the login function from UserContext
-    const [activeTab, setActiveTab] = useState('login');
+    const { user, login } = useContext(UserContext);
     const [formData, setFormData] = useState({
-        name: '',
-        username: '',
         email: '',
         password: ''
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [termsAccepted, setTermsAccepted] = useState(false);
     const navigate = useNavigate();
-
-
-    const handleTabChange = (tab) => {
-        setActiveTab(tab);
-        setError('');
-        setSuccess('');
-    };
+    
+    // If user is already logged in and is an admin, redirect to admin panel
+    useEffect(() => {
+        if (user && user.isAdmin) {
+            navigate('/admin');
+        }
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -40,19 +34,10 @@ function Login() {
         });
     };
 
-    const handleTermsChange = (e) => {
-        setTermsAccepted(e.target.checked);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (activeTab === 'register' && !termsAccepted) {
-            setError('You must accept the terms and conditions to register.');
-            return;
-        }
         try {
-            const endpoint = activeTab === 'login' ? 'http://localhost:3001/api/users/login' : 'http://localhost:3001/api/users/register';
-            const response = await fetch(endpoint, {
+            const response = await fetch(`${API_URL}/api/users/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,16 +56,22 @@ function Login() {
             const result = await response.json();
             const { token, user } = result;
 
+            // Check if user is admin
+            if (!user.isAdmin) {
+                throw new Error('Access denied. Admin privileges required.');
+            }
+
             localStorage.setItem('token', token);
             login(user); // Pass the user data to UserContext
 
-            setSuccess(activeTab === 'login' ? 'Logged in successfully' : 'Registered successfully');
-            setFormData({ name: '', username: '', email: '', password: '' }); // Clear form data
-
-            // Navigate to the homepage only if login was successful
-            if (activeTab === 'login') {
-                navigate('/'); 
-            }
+            setSuccess('Admin login successful');
+            setFormData({ 
+                email: '', 
+                password: ''
+            }); 
+            
+            // Navigate to admin panel
+            navigate('/admin');
 
         } catch (error) {
             setError(error.message);
@@ -89,43 +80,16 @@ function Login() {
 
     return (
         <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
-            <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
-                <MDBTabsItem>
-                    <MDBTabsLink onClick={() => handleTabChange('login')} active={activeTab === 'login'}>
-                        Login
-                    </MDBTabsLink>
-                </MDBTabsItem>
-                <MDBTabsItem>
-                    <MDBTabsLink onClick={() => handleTabChange('register')} active={activeTab === 'register'}>
-                        Register
-                    </MDBTabsLink>
-                </MDBTabsItem>
-            </MDBTabs>
-
-            {error && <p className="text-danger">{error}</p>}
-            {success && <p className="text-success">{success}</p>}
+            <h2 className="text-center mb-4">Admin Panel Access</h2>
+            
+            {error && <div className="alert alert-danger" role="alert">{error}</div>}
+            {success && <div className="alert alert-success" role="alert">{success}</div>}
 
             <form onSubmit={handleSubmit}>
-                {activeTab === 'login' && (
-                    <>
-                        <MDBInput wrapperClass='mb-4' label='Email address' id='email' type='email' value={formData.email} onChange={handleChange} />
-                        <MDBInput wrapperClass='mb-4' label='Password' id='password' type='password' value={formData.password} onChange={handleChange} />
-                        <MDBBtn className="btn btn-dark mb-4 w-100" type="submit">Sign in</MDBBtn>
-                    </>
-                )}
-
-                {activeTab === 'register' && (
-                    <>
-                        <MDBInput wrapperClass='mb-4' label='Name' id='name' type='text' value={formData.name} onChange={handleChange} />
-                        <MDBInput wrapperClass='mb-4' label='Username' id='username' type='text' value={formData.username} onChange={handleChange} />
-                        <MDBInput wrapperClass='mb-4' label='Email' id='email' type='email' value={formData.email} onChange={handleChange} />
-                        <MDBInput wrapperClass='mb-4' label='Password' id='password' type='password' value={formData.password} onChange={handleChange} />
-                        <div className='d-flex justify-content-center mb-4'>
-                            <MDBCheckbox name='terms' id='terms' checked={termsAccepted} onChange={handleTermsChange} label='I have read and agree to the terms' />
-                        </div>
-                        <MDBBtn className="btn btn-dark mb-4 w-100" type="submit" disabled={!termsAccepted}>Sign up</MDBBtn>
-                    </>
-                )}
+                <MDBInput wrapperClass='mb-4' label='Admin Email' id='email' type='email' value={formData.email} onChange={handleChange} required />
+                <MDBInput wrapperClass='mb-4' label='Password' id='password' type='password' value={formData.password} onChange={handleChange} required />
+                <MDBBtn className="btn btn-dark mb-4 w-100" type="submit">Admin Sign In</MDBBtn>
+                <p className="text-center"><small>This login is for administrative access only.</small></p>
             </form>
         </MDBContainer>
     );

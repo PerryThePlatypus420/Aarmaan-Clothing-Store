@@ -10,7 +10,8 @@ const orderSchema = new mongoose.Schema({
   additionalInfo: String,
   products: [{
     productId: mongoose.Schema.Types.ObjectId,
-    quantity: Number
+    quantity: Number,
+    size: String
   }],
   totalAmount: Number,
   status: { 

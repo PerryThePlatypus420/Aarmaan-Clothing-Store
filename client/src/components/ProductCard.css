@@ -25,30 +25,69 @@
   background-repeat: no-repeat; /* Prevent image from repeating */
 }
 
+.heart-cont {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.heart-cont:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+}
+
+.heart-cont-prod-details {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(221, 221, 221, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.heart-cont-prod-details:hover {
+  background-color: rgb(240, 240, 240);
+  transform: scale(1.05);
+}
+
 .product-details {
   padding: 1rem;
   background-color: #eeeeeec7;
-  height: 25%; /* Reduced height for details section */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .product-title {
   font-size: 1rem;
-  font-weight: semibold;
-  margin: 0 0 0.3rem 0;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
   white-space: normal; /* Allow text to wrap */
   overflow: visible; /* Prevent truncation */
   text-overflow: clip; /* Disable ellipsis */
   text-align: center; /* Center-align the text */
-  flex-grow: 1; /* Allows the title section to grow */
+  line-height: 1.2;
 }
 
 .product-price {
   font-size: 0.9rem;
   color: gray;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
+  text-align: center;
 }
 
 .add-to-cart-btn {
@@ -73,38 +112,18 @@
   background-color: #000000;
 }
 
-.heart-cont {
-  width: 50px;
-  height: 50px;
-  position: relative;
-  cursor: pointer;
-  padding-top: 2px;
-}
-
 .heart-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 28px; /* Increased size */
+  font-size: 20px;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .heart-icon.outline {
-  color: gray; /* Default color */
+  color: #666;
 }
 
 .heart-icon.filled {
-  color: red;
-  transform: translate(-50%, -50%) scale(1.1); /* Slightly pop effect */
-}
-
-.heart-cont > * {
-  position: absolute;
-  top: 38%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  scale: 0.9; /* Slightly smaller heart icon */
+  color: #e74c3c;
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

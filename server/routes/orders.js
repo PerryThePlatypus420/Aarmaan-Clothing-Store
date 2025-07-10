@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const Product = require("../models/Product");
+const { authenticateAdmin } = require('./auth');
 
 
 // Create an order
@@ -41,7 +42,7 @@ router.post('/create', async (req, res) => {
 });
 
 // Get total number of orders
-router.get('/total-orders', async (req, res) => {
+router.get('/total-orders', authenticateAdmin, async (req, res) => {
   try {
     const totalOrders = await Order.countDocuments(); // Count total orders
     res.json({ totalOrders });
@@ -52,7 +53,7 @@ router.get('/total-orders', async (req, res) => {
 });
 
 // Get all orders with product details
-router.get("/all-orders", async (req, res) => {
+router.get("/all-orders", authenticateAdmin, async (req, res) => {
   try {
       const orders = await Order.find().sort({ createdAt: -1 }); // Sort newest first
 
@@ -83,7 +84,7 @@ router.get("/all-orders", async (req, res) => {
 
 
 // Update order status
-router.put("/update-status/:id", async (req, res) => {
+router.put("/update-status/:id", authenticateAdmin, async (req, res) => {
   try {
       const { status } = req.body;
       const updatedOrder = await Order.findByIdAndUpdate(

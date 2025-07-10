@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import Categories from "../components/Categories";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function Category() {
 
     const { cat } = useParams();
@@ -11,7 +13,7 @@ function Category() {
 
     React.useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch(`http://localhost:3001/api/products/category/${cat}`);
+            const response = await fetch(`${API_URL}/api/products/category/${cat}`);
             const data = await response.json();
             setProducts(data);
         };
@@ -24,20 +26,21 @@ function Category() {
         <div className="mt-5">
             <Categories />
             <h1 className="mt-4">{cat}</h1>
+            <div className="container-fluid">
+                <div className="row my-4">
+                    {products.map((product, index) => (
+                        <div key={product._id || index} className="col-md-3 my-3">
+                            <ProductCard
+                                id={product._id}
+                                title={product.title}
+                                price={product.price}
+                                imgs={product.images}
+                            />
 
-            <div className="row my-4">
-                {products.map((product, index) => (
-                    <div key={product.id || index} className="col-md-3 my-3">
-                        <ProductCard
-                            id={product.id}
-                            title={product.title}
-                            price={product.price}
-                            img={product.img}
-                        />
-                    </div>
-                ))}
+                        </div>
+                    ))}
+                </div>
             </div>
-
 
         </div>
 

@@ -1,12 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { MDBBtn, MDBCard, MDBCardBody, MDBCardHeader, MDBCol, MDBInput, MDBListGroup, MDBListGroupItem, MDBRow, MDBTextArea, MDBTypography } from 'mdb-react-ui-kit';
+import { MDBBtn, MDBCard, MDBCardBody, MDBCardHeader, MDBCol, MDBInput, MDBRow, MDBTextArea, MDBTypography } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../cartContext';
+import { useSettings } from '../settingsContext';
 import { ThreeDots } from "react-loader-spinner";
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default function Checkout() {
     const { cart } = useContext(CartContext);
+    const { settings, loading: settingsLoading } = useSettings();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,13 +27,14 @@ export default function Checkout() {
     useEffect(() => {
         const fetchCartProducts = async () => {
             try {
-                const productIds = Object.keys(cart).filter(id => id !== 'count');
+                // Extract product IDs from the new cart structure
+                const productIds = cart.items ? Object.values(cart.items).map(item => item.productId) : [];
                 if (productIds.length === 0) {
                     setLoading(false);
                     return;
                 }
 
-                const response = await fetch('http://localhost:3001/api/products/ids', {
+                const response = await fetch(`${API_URL}/api/products/ids`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -70,16 +74,20 @@ export default function Checkout() {
 
         if (isFormValid) {
             try {
+                // Calculate shipping cost based on settings
+                const shippingCost = (settings.freeDeliveryThreshold !== null && total >= settings.freeDeliveryThreshold) ? 0 : (settings.deliveryFee || 250);
+                
                 const orderData = {
                     ...formData,
-                    products: Object.keys(cart).filter(id => id !== 'count').map(id => ({
-                        productId: id,
-                        quantity: cart[id]
-                    })),
-                    totalAmount: total < 2500 ? total + 250 : total
+                    products: cart.items ? Object.values(cart.items).map(item => ({
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        size: item.size || ''
+                    })) : [],
+                    totalAmount: total + shippingCost
                 };
 
-                const response = await fetch('http://localhost:3001/api/orders/create', {
+                const response = await fetch(`${API_URL}/api/orders/create`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -104,11 +112,18 @@ export default function Checkout() {
 
 
     const total = products.reduce((acc, product) => {
-        const quantity = cart[product.id] || 0;
-        return acc + product.price * quantity;
+        // Calculate total from the new cart structure
+        const cartItems = cart.items ? Object.values(cart.items).filter(item => item.productId === (product._id || product.id)) : [];
+        const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+        return acc + product.price * totalQuantity;
     }, 0);
 
-    if (loading) return <div className="d-flex justify-content-center align-items-center vh-100">
+    // Debug logging
+    console.log('Cart structure:', cart);
+    console.log('Products loaded:', products);
+    console.log('Calculated total:', total);
+
+    if (loading || settingsLoading) return <div className="d-flex justify-content-center align-items-center vh-100">
         <ThreeDots
             visible={true}
             height="80"
@@ -208,27 +223,75 @@ export default function Checkout() {
                     </MDBCard>
                 </MDBCol>
                 <MDBCol md="4" className="mb-4">
-                    <MDBCard className="mb-4">
-                        <MDBCardHeader className="py-3">
-                            <MDBTypography tag="h5" className="mb-0">Summary</MDBTypography>
+                    <MDBCard className="mb-4 shadow-sm">
+                        <MDBCardHeader className="py-3 bg-light">
+                            <MDBTypography tag="h5" className="mb-0 fw-bold text-dark">Order Summary</MDBTypography>
                         </MDBCardHeader>
-                        <MDBCardBody>
-                            <MDBListGroup flush>
-                                <MDBListGroupItem className="d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                                    Products
-                                    <span>Rs. {total}</span>
-                                </MDBListGroupItem>
-                                <MDBListGroupItem className="d-flex justify-content-between align-items-center border-0 px-0">
-                                    Shipping
-                                    <span>{total < 2500 ? "Rs. 250" : "FREE"}</span>
-                                </MDBListGroupItem>
-                                <MDBListGroupItem className="d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                                    <div>
-                                        <strong>Total amount</strong>
-                                    </div>
-                                    <span><strong>{total < 2500 ? total + 250 : total}</strong></span>
-                                </MDBListGroupItem>
-                            </MDBListGroup>
+                        <MDBCardBody className="p-4">
+                            {/* Cart Items */}
+                            {cart.items && Object.values(cart.items).length > 0 ? (
+                                <div className="mb-4">
+                                    {Object.values(cart.items).map((item, index) => {
+                                        const product = products.find(p => (p._id || p.id) === item.productId);
+                                        if (!product) return null;
+                                        return (
+                                            <div key={index} className="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                                                <div className="flex-grow-1">
+                                                    <div className="fw-semibold text-dark mb-1">{product.title}</div>
+                                                    <div className="small text-muted">
+                                                        {item.size && (
+                                                            <span className="me-3">
+                                                                <i className="fas fa-tag me-1"></i>
+                                                                Size: {item.size}
+                                                            </span>
+                                                        )}
+                                                        <span>
+                                                            <i className="fas fa-box me-1"></i>
+                                                            Qty: {item.quantity}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-end">
+                                                    <div className="fw-bold text-dark">Rs. {(product.price * item.quantity).toLocaleString()}</div>
+                                                    <div className="small text-muted">Rs. {product.price.toLocaleString()} each</div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4 text-muted">
+                                    <i className="fas fa-shopping-cart fa-2x mb-2"></i>
+                                    <p>Your cart is empty</p>
+                                </div>
+                            )}
+
+                            {/* Summary Totals */}
+                            <div className="border-top pt-3">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <span className="text-muted">Subtotal</span>
+                                    <span className="fw-semibold">Rs. {total.toLocaleString()}</span>
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <span className="text-muted">Shipping</span>
+                                    <span className="fw-semibold">
+                                        {settings.freeDeliveryThreshold !== null && total >= settings.freeDeliveryThreshold ? (
+                                            <span className="text-success">FREE</span>
+                                        ) : (
+                                            `Rs. ${settings.deliveryFee?.toLocaleString() || '250'}`
+                                        )}
+                                    </span>
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center py-2 border-top">
+                                    <span className="h6 fw-bold mb-0">Total Amount</span>
+                                    <span className="h5 fw-bold mb-0 text-primary">
+                                        Rs. {(() => {
+                                            const shippingCost = (settings.freeDeliveryThreshold !== null && total >= settings.freeDeliveryThreshold) ? 0 : (settings.deliveryFee || 250);
+                                            return (total + shippingCost).toLocaleString();
+                                        })()}
+                                    </span>
+                                </div>
+                            </div>
                         </MDBCardBody>
                     </MDBCard>
                 </MDBCol>

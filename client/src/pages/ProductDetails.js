@@ -6,6 +6,9 @@ import { FaCartPlus } from "react-icons/fa";
 import { WishlistContext } from "../wishlistContext";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { ThreeDots } from "react-loader-spinner";
+// import "../components/ProductCard.css";
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Product() {
   const { addItemToCart } = useContext(CartContext);
@@ -17,7 +20,7 @@ function Product() {
 
   React.useEffect(() => {
     const fetchProduct = async () => {
-      const response = await fetch(`http://localhost:3001/api/products/${id}`);
+      const response = await fetch(`${API_URL}/api/products/${id}`);
       const data = await response.json();
       setProduct(data);
       setLoading(false);
@@ -26,6 +29,15 @@ function Product() {
   }, [id]);
 
   const [items, setItems] = React.useState(1);
+  const [selectedSize, setSelectedSize] = React.useState("");
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+
+  // Get the current selected size's stock
+  const getSelectedSizeStock = () => {
+    if (!selectedSize || !product.sizes) return 0;
+    const sizeObj = product.sizes.find(s => s.size === selectedSize);
+    return sizeObj ? sizeObj.stock : 0;
+  };
 
   if (loading) {
     return (
@@ -35,110 +47,250 @@ function Product() {
     );
   }
 
-  const { productDescription, fabricComposition, designDetails } = product.description || {};
+  // Reset quantity to 1 when size changes
+  const handleSizeChange = (e) => {
+    setSelectedSize(e.target.value);
+    setItems(1);
+  };
 
   const handleWishlist = (e) => {
     e.preventDefault();
     toggleItemInWishlist(id);
   };
 
+  const handleSlideChange = (direction) => {
+    if (direction === 'next') {
+      setCurrentSlide((prev) => (prev + 1) % product.images.length);
+    } else {
+      setCurrentSlide((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  // Get the maximum allowed quantity based on product type and selection
+  const getMaxQuantity = () => {
+    if (product.sizes && product.sizes.length > 0) {
+      return selectedSize ? getSelectedSizeStock() : 0;
+    } else {
+      return product.stock || 0;
+    }
+  };
+
   return (
-    <div className="container py-5 text-start">
-      <div className="row mt-4">
-        <div className="col-md-6 mb-4">
-          {/* Product Image */}
-          <div className="overflow-hidden rounded shadow-sm">
-            {product.img instanceof Array ? (
-              <div id="carouselExampleControls" className="carousel slide">
+    <div className="container py-4">
+      <div className="row g-4">
+        {/* Product Image Section */}
+        <div className="col-12 col-md-6">
+          <div className="position-relative bg-white rounded-3 overflow-hidden shadow-sm">
+            {product.images instanceof Array && product.images.length > 0 ? (
+              <div id="carouselExampleControls" className="carousel slide" data-bs-ride="false">
                 <div className="carousel-inner">
-                  {product.img.map((image, index) => (
-                    <div className={`carousel-item ${index === 0 ? "active" : ""}`} key={index}>
-                      <img src={image} className="d-block w-100" alt="Product-Image"
-                        style={{ maxHeight: "500px", objectFit: "contain" }} />
+                  {product.images.map((image, index) => (
+                    <div className={`carousel-item ${index === currentSlide ? "active" : ""}`} key={index}>
+                      <img 
+                        src={image} 
+                        className="d-block w-100" 
+                        alt="Product Image"
+                        style={{ 
+                          height: "500px", 
+                          objectFit: "cover",
+                          backgroundColor: "#ffffff"
+                        }} 
+                      />
                     </div>
                   ))}
                 </div>
-                <button className="carousel-control-prev" type="button"
-                  data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Previous</span>
-                </button>
-                <button className="carousel-control-next" type="button"
-                  data-bs-target="#carouselExampleControls" data-bs-slide="next">
-                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Next</span>
-                </button>
+                {product.images.length > 1 && (
+                  <>
+                    <button 
+                      className="carousel-control-prev" 
+                      type="button"
+                      onClick={() => handleSlideChange('prev')}
+                      style={{ width: "8%" }}
+                    >
+                      <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span className="visually-hidden">Previous</span>
+                    </button>
+                    <button 
+                      className="carousel-control-next" 
+                      type="button"
+                      onClick={() => handleSlideChange('next')}
+                      style={{ width: "8%" }}
+                    >
+                      <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span className="visually-hidden">Next</span>
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
-              <img src={product.img} alt="Product-Image" className="img-fluid w-100"
-                style={{ maxHeight: "500px", objectFit: "cover" }} />
+              <img 
+                src={product.images?.[0]} 
+                alt="Product Image" 
+                className="img-fluid w-100"
+                style={{ 
+                  height: "500px", 
+                  objectFit: "cover",
+                  backgroundColor: "#ffffff"
+                }} 
+              />
+            )}
+            
+            {/* Image Counter - Small badge */}
+            {product.images instanceof Array && product.images.length > 1 && (
+              <div className="position-absolute bottom-0 end-0 m-3">
+                <span className="badge bg-dark bg-opacity-75 px-2 py-1 rounded-pill small">
+                  {currentSlide + 1} / {product.images.length}
+                </span>
+              </div>
             )}
           </div>
         </div>
-        
-        {/* Product Details */}
-        <div className="col-md-6 d-flex flex-column justify-content-between">
-          <div className="d-flex flex-column justify-content-center gap-4">
-            {/* Product Title */}
-            <h1 className="h3 fw-bold text-black d-flex align-items-center justify-content-between">
-              {product.title}
-              <div className="heart-cont ms-2" onClick={handleWishlist}>
+
+        {/* Product Information Section */}
+        <div className="col-12 col-md-6">
+          <div className="h-100 d-flex flex-column">
+            {/* Product Title and Wishlist */}
+            <div className="d-flex align-items-start justify-content-between mb-3">
+              <h1 className="h4 fw-semibold text-dark mb-0 me-3" style={{ lineHeight: "1.3" }}>
+                {product.title}
+              </h1>
+              <div className="heart-cont-prod-details" onClick={handleWishlist} style={{ cursor: "pointer", fontSize: "1.4rem" }}>
                 {isInWishlist(id) ? (
-                  <IoHeart className="heart-icon filled" />
+                  <IoHeart className="text-danger" style={{ filter: "drop-shadow(0 0 3px rgba(220, 53, 69, 0.3))" }} />
                 ) : (
-                  <IoHeartOutline className="heart-icon outline" />
+                  <IoHeartOutline className="text-muted" style={{ transition: "color 0.2s ease" }} />
                 )}
               </div>
-            </h1>
+            </div>
 
-            {/* Product Description */}
-            {productDescription && (
-              <p className="mt-3">
-                <b>Product Description: </b>
-                {productDescription}
-              </p>
-            )}
-            {fabricComposition && (
-              <div className="mt-3 ">
-                <b>Fabric Composition: </b>
-                <ul>
-                  {Object.entries(fabricComposition).map(([key, value]) => (
-                    <li key={key}>{key}: {value}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {designDetails && (
-              <div className="mt-3 ">
-                <b>Design Details: </b>
-                <ul>
-                  {Object.entries(designDetails).map(([key, value]) => (
-                    <li key={key}>{key}: {value}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
             {/* Product Price */}
-            <span className="h4 fw-bold text-black">Rs. {product.price}</span>
-          </div>
+            <div className="mb-4">
+              <span className="h5 text-success fw-bold">Rs. {product.price?.toLocaleString()}</span>
+            </div>
 
-          {/* Quantity Input and Order Button */}
-          <div className="mt-4">
-            <div className="mb-3">
-              {/* Quantity Label */}
-              <div className="d-flex flex-row align-items-center justify-content-between gap-3">
-                <label className="fw-bold">Quantity</label>
-                {/* Quantity Input */}
-                <input className="form-control" type="number" min="1" required
-                  onChange={(e) => setItems(e.target.value)} value={items}
-                  style={{ maxWidth: "100px" }} />
-                {/* Order Button */}
-                <button className="btn btn-dark d-flex justify-content-center align-items-center gap-2 flex-grow-1"
-                  title="Confirm Order" onClick={() => addItemToCart(id, items)}>
-                  <FaCartPlus /> <span>Add to Cart</span>
-                </button>
+            {/* Size Selection and Stock Info */}
+            {product.sizes && product.sizes.length > 0 ? (
+              <div className="mb-4">
+                <h6 className="fw-bold mb-3 text-dark">Available Sizes</h6>
+                <div className="d-flex flex-wrap gap-2 mb-3">
+                  {product.sizes.map((sizeItem, index) => (
+                    <div 
+                      key={index} 
+                      className={`border rounded-2 p-2 text-center position-relative ${
+                        selectedSize === sizeItem.size 
+                          ? 'border-primary bg-primary text-white shadow-sm' 
+                          : sizeItem.stock === 0 
+                            ? 'border-danger bg-light text-muted' 
+                            : 'border-secondary bg-white text-dark shadow-sm'
+                      }`}
+                      style={{ 
+                        minWidth: "60px", 
+                        cursor: sizeItem.stock > 0 ? "pointer" : "not-allowed",
+                        transition: "all 0.2s ease"
+                      }}
+                      onClick={() => sizeItem.stock > 0 && handleSizeChange({ target: { value: sizeItem.size } })}
+                    >
+                      <div className="fw-bold small">{sizeItem.size}</div>
+                      <div className="small mt-1" style={{ fontSize: "0.75rem" }}>
+                        {sizeItem.stock > 0 ? `${sizeItem.stock} left` : 'Out'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {selectedSize && (
+                  <div className="alert alert-light border-primary py-2 small">
+                    Selected: <strong>{selectedSize}</strong> - {getSelectedSizeStock()} items available
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="mb-4">
+                <div className={`alert ${product.stock > 0 ? 'alert-success' : 'alert-danger'} border-0 py-2 rounded-3`}>
+                  <div className="d-flex align-items-center">
+                    <div className="me-2">
+                      {product.stock > 0 ? (
+                        <i className="bi bi-check-circle-fill"></i>
+                      ) : (
+                        <i className="bi bi-x-circle-fill"></i>
+                      )}
+                    </div>
+                    <div className="small">
+                      <strong>Stock:</strong> {product.stock > 0 ? 
+                        `${product.stock} items available` : 
+                        'Currently out of stock'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Quantity and Add to Cart */}
+            <div className="mb-4">
+              <div className="row g-2 align-items-end">
+                <div className="col-6 col-sm-4">
+                  <label className="form-label fw-bold text-dark mb-2 small">Quantity</label>
+                  <input 
+                    className="form-control text-center border-2 rounded-2" 
+                    type="number" 
+                    min="1" 
+                    max={getMaxQuantity()}
+                    onChange={(e) => {
+                      const max = getMaxQuantity();
+                      const newValue = parseInt(e.target.value) || 1;
+                      setItems(Math.min(Math.max(1, newValue), max));
+                    }}
+                    value={items}
+                    disabled={(!selectedSize && product.sizes && product.sizes.length > 0) || getMaxQuantity() <= 0}
+                  />
+                </div>
+                <div className="col-6 col-sm-8">
+                  <button 
+                    className="btn btn-dark w-100 d-flex justify-content-center align-items-center gap-2 rounded-2"
+                    style={{ 
+                      fontSize: "0.9rem",
+                      fontWeight: "500",
+                      transition: "all 0.2s ease",
+                      padding: "0.5rem 1rem"
+                    }}
+                    onClick={() => {
+                      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                        alert("Please select a size");
+                        return;
+                      }
+                      if (getMaxQuantity() <= 0) {
+                        alert("This item is out of stock");
+                        return;
+                      }
+                      addItemToCart(id, items, selectedSize, getMaxQuantity());
+                    }}
+                    disabled={(product.sizes && product.sizes.length > 0 && !selectedSize) || 
+                              getMaxQuantity() <= 0}
+                  >
+                    <FaCartPlus /> <span>Add to Cart</span>
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* Product Description */}
+            {product.description && (
+              <div className="mb-4 p-3 bg-light rounded-3">
+                <h6 className="fw-bold mb-2 text-dark">Description</h6>
+                <p className="text-muted lh-base mb-0" style={{ fontSize: "0.9rem" }}>
+                  {product.description}
+                </p>
+              </div>
+            )}
+
+            {/* Design Details */}
+            {product.design_details && (
+              <div className="mb-4 p-3 bg-light rounded-3">
+                <h6 className="fw-bold mb-2 text-dark">Design Details</h6>
+                <p className="text-muted lh-base mb-0" style={{ fontSize: "0.9rem" }}>
+                  {product.design_details}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

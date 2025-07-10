@@ -4,6 +4,7 @@ import { WishlistContext } from '../wishlistContext';
 import { Link } from 'react-router-dom';
 import { ThreeDots } from "react-loader-spinner";
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Wishlist() {
     const { wishlist } = useContext(WishlistContext);
@@ -20,7 +21,7 @@ function Wishlist() {
                     setProducts([]);
                     return;
                 }
-                const response = await fetch('http://localhost:3001/api/products/ids', {
+                const response = await fetch(`${API_URL}/api/products/ids`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -73,7 +74,7 @@ function Wishlist() {
                                 id={product._id}
                                 title={product.title}
                                 price={product.price}
-                                img={product.img}
+                                imgs={product.images}
                             />
                         </div>
                     ))}

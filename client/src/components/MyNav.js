@@ -7,6 +7,8 @@ import { FiMenu } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import { VscDebugBreakpointData } from "react-icons/vsc";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function MyNav() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -17,7 +19,7 @@ function MyNav() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categories');
+                const response = await fetch(`${API_URL}/api/categories`);
                 const data = await response.json();
                 setCategories(data);
             } catch (error) {
@@ -34,7 +36,7 @@ function MyNav() {
         <div className="nav-main">
             <div className="nav-top">آرمان is live now !
                 <Link to='/login'>
-                    <div className="circle-icon">
+                    <div className="circle-icon" title="Admin Login">
                         <VscDebugBreakpointData />
                     </div>
                 </Link>

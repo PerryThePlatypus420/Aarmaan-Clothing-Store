@@ -27,14 +27,16 @@ const productSchema = new mongoose.Schema({
     },
     sizes: [{
         size: {
-            type: String,
-            required: true
+            type: String
         },
         stock: {
-            type: Number,
-            required: true
+            type: Number
         }
-    }]
+    }],
+    stock: {
+        type: Number,
+        default: 0
+    }
 });
 
 // Virtual field for id

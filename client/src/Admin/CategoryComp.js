@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CategoryComp = ({ onBack }) => {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -12,8 +14,19 @@ const CategoryComp = ({ onBack }) => {
     useEffect(() => { fetchCategories(); }, []);
 
     const fetchCategories = () => {
-        fetch("http://localhost:3001/api/categories")
-            .then(response => response.json())
+        // Get the authentication token
+        const token = localStorage.getItem('token');
+        fetch(`${API_URL}/api/categories`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch categories');
+                }
+                return response.json();
+            })
             .then(data => setCategories(data))
             .catch(error => console.error("Error fetching categories:", error));
     };
@@ -25,45 +38,45 @@ const CategoryComp = ({ onBack }) => {
         }
         return null;
     };
-    
-    const openAddModal = () => { 
-        setNewCategory({ category: "", img: "" }); 
-        setSelectedCategory(null); 
-        setIsEditing(false); 
-        setShowModal(true); 
+
+    const openAddModal = () => {
+        setNewCategory({ category: "", img: "" });
+        setSelectedCategory(null);
+        setIsEditing(false);
+        setShowModal(true);
         setImageFile(null);
     };
 
-   
-    const handleInputChange = (e) => { 
-        const { name, value } = e.target; 
-        setNewCategory({ ...newCategory, [name]: value }); 
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewCategory({ ...newCategory, [name]: value });
     };
 
     // Update the handleImageUpload function
-const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewCategory({ ...newCategory, img: reader.result });
-        };
-        reader.readAsDataURL(file);
-        setImageFile(file);
-    }
-};
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setNewCategory({ ...newCategory, img: reader.result });
+            };
+            reader.readAsDataURL(file);
+            setImageFile(file);
+        }
+    };
 
-// Update the openEditModal function
-const openEditModal = (category) => {
-    setSelectedCategory(category);
-    setNewCategory({
-        ...category,
-        img: category.img // The image is already in base64 format from the backend
-    });
-    setIsEditing(false);
-    setShowModal(true);
-    setImageFile(null);
-};
+    // Update the openEditModal function
+    const openEditModal = (category) => {
+        setSelectedCategory(category);
+        setNewCategory({
+            ...category,
+            img: category.img // The image is already in base64 format from the backend
+        });
+        setIsEditing(false);
+        setShowModal(true);
+        setImageFile(null);
+    };
 
     const addCategory = () => {
         const formData = new FormData();
@@ -72,14 +85,19 @@ const openEditModal = (category) => {
             formData.append("img", imageFile);
         }
 
-        fetch("http://localhost:3001/api/categories/add", {
-            method: "POST", 
+        // Get the authentication token
+        const token = localStorage.getItem('token');
+        fetch(`${API_URL}/api/categories/add`, {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData,
         })
             .then(response => response.json())
-            .then(() => { 
-                fetchCategories(); 
-                setShowModal(false); 
+            .then(() => {
+                fetchCategories();
+                setShowModal(false);
             })
             .catch(error => console.error("Error adding category:", error));
     };
@@ -91,31 +109,43 @@ const openEditModal = (category) => {
             formData.append("img", imageFile);
         }
 
-        fetch(`http://localhost:3001/api/categories/edit/${selectedCategory._id}`, {
-            method: "PUT", 
+        // Get the authentication token
+        const token = localStorage.getItem('token');
+        fetch(`${API_URL}/api/categories/edit/${selectedCategory._id}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData,
         })
             .then(response => response.json())
-            .then(() => { 
-                fetchCategories(); 
-                setShowModal(false); 
+            .then(() => {
+                fetchCategories();
+                setShowModal(false);
             })
             .catch(error => console.error("Error updating category:", error));
     };
 
     const openDeleteModal = () => { setShowModal(false); setShowDeleteModal(true); };
     const deleteCategory = () => {
-        fetch(`http://localhost:3001/api/categories/delete/${selectedCategory._id}`, { method: "DELETE" })
-            .then(() => { 
-                fetchCategories(); 
-                setShowDeleteModal(false); 
+        // Get the authentication token
+        const token = localStorage.getItem('token');
+        fetch(`${API_URL}/api/categories/delete/${selectedCategory._id}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(() => {
+                fetchCategories();
+                setShowDeleteModal(false);
             })
             .catch(error => console.error("Error deleting category:", error));
     };
 
     const renderImage = (imageData) => {
         if (!imageData) return null;
-        
+
         try {
             // If it's already a valid data URL, return it
             if (imageData.startsWith('data:image')) {
@@ -135,6 +165,15 @@ const openEditModal = (category) => {
                 <button className="btn btn-secondary mb-2 mb-sm-0" onClick={onBack}>Back to Dashboard</button>
                 <h2 className="text-center flex-grow-1 mb-2 order-h1 mb-sm-0">Category Management</h2>
                 <button className="btn btn-primary order-h1" onClick={openAddModal}>Add Category</button>
+            </div>
+
+            <div className="text-center mb-2">
+                <span className="badge bg-info text-dark">
+                    Total Categories:
+                    <span className="fs-6">
+                        {" "}{categories.length}
+                    </span>
+                </span>
             </div>
 
             <div className="row g-3 mt-4 mb-4">
