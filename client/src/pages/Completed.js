@@ -26,7 +26,7 @@ function Completed() {
         <MDBContainer className="py-5">
             <MDBRow className="justify-content-center">
                 <MDBCol md="8" lg="6">
-                    <MDBCard className="shadow-sm border-0" style={{ backgroundColor: "rgba(223, 223, 223, 0.47)" }}>
+                    <MDBCard className="shadow-sm border-0" style={{ backgroundColor: "rgba(255, 255, 255, 0.47)" }}>
                         <MDBCardBody className="text-center p-5">
 
                             {/* Success Icon Fallback */}

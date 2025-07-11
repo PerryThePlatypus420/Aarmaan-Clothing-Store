@@ -6,7 +6,6 @@ import { FaCartPlus } from "react-icons/fa";
 import { WishlistContext } from "../wishlistContext";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { ThreeDots } from "react-loader-spinner";
-// import "../components/ProductCard.css";
 
 const API_URL = process.env.REACT_APP_API_URL;
 

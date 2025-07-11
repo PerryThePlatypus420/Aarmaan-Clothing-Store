@@ -39,7 +39,7 @@ const App = () => {
 
 const MainLayout = () => {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/secret-admin-portal');
 
   return (
     <div className="App">
@@ -50,11 +50,11 @@ const MainLayout = () => {
         <Route path='/product/:id' element={<ProductDetails />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/wishlist' element={<Wishlist />} />
-        <Route path='/login' element={<Login />} />
+        <Route path='/very-secret-login' element={<Login />} />
         <Route path='/checkout' element={<CheckoutPage />} />
         <Route path='/completed' element={<Completed />} />
         <Route path='/about-us' element={<AboutUs />} />
-        <Route path='/admin' element={
+        <Route path='/secret-admin-portal' element={
           <ProtectedRoute>
             <AdminHome />
           </ProtectedRoute>

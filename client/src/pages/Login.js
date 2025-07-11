@@ -22,7 +22,7 @@ function Login() {
     // If user is already logged in and is an admin, redirect to admin panel
     useEffect(() => {
         if (user && user.isAdmin) {
-            navigate('/admin');
+            navigate('/secret-admin-portal');
         }
     }, [user, navigate]);
 
@@ -71,7 +71,7 @@ function Login() {
             }); 
             
             // Navigate to admin panel
-            navigate('/admin');
+            navigate('/secret-admin-portal');
 
         } catch (error) {
             setError(error.message);

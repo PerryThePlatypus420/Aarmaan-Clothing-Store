@@ -26,18 +26,47 @@ const AdminHome = () => {
     const adminBadgeRef = useRef(null);
 
     const renderComponent = () => {
+        // Prioritize rendering components opened from the settings dropdown
         if (showAddAdmin) {
-            return <AddAdmin onClose={() => setShowAddAdmin(false)} />;
+            return (
+                <>
+                    <button 
+                        className="btn btn-secondary mb-4"
+                        onClick={() => {
+                            setShowAddAdmin(false);
+                            setSection("Dashboard");
+                        }}
+                    >
+                        Back to Dashboard
+                    </button>
+                    <AddAdmin onClose={() => setShowAddAdmin(false)} />
+                </>
+            );
         }
         
         if (showChangePassword) {
-            return <ChangePassword onClose={() => setShowChangePassword(false)} />;
+            return (
+                <>
+                    <button 
+                        className="btn btn-secondary mb-4"
+                        onClick={() => {
+                            setShowChangePassword(false);
+                            setSection("Dashboard");
+                        }}
+                    >
+                        Back to Dashboard
+                    </button>
+                    <ChangePassword onClose={() => setShowChangePassword(false)} />
+                </>
+            );
         }
         
         if (showSettings) {
+            console.log("Rendering SettingsComp");
             return <SettingsComp onBack={() => setShowSettings(false)} />;
         }
         
+        // Only render section components if no settings component is active
         switch (section) {
             case "Orders":
                 return <OrdersComp onBack={() => setSection("Dashboard")} />;
@@ -59,12 +88,17 @@ const AdminHome = () => {
     // Handle actual logout after confirmation
     const handleLogoutConfirm = () => {
         logout();
-        navigate('/login');
+        navigate('/very-secret-login');
         setShowLogoutModal(false);
     };
 
     // Handle change password click
     const handleChangePassword = () => {
+        // Close other components first
+        setShowAddAdmin(false);
+        setShowSettings(false);
+        
+        // Then open this component
         setShowChangePassword(true);
         setDropdownOpen(false);
         setSection("Change Password"); // Update section title
@@ -72,6 +106,11 @@ const AdminHome = () => {
 
     // Handle add admin click
     const handleAddAdmin = () => {
+        // Close other components first
+        setShowChangePassword(false);
+        setShowSettings(false);
+        
+        // Then open this component
         setShowAddAdmin(true);
         setDropdownOpen(false);
         setSection("Add Admin"); // Update section title
@@ -79,9 +118,15 @@ const AdminHome = () => {
 
     // Handle settings click
     const handleSettings = () => {
+        console.log("Opening delivery settings...");
+        // Close other components first
+        setShowChangePassword(false);
+        setShowAddAdmin(false);
+        
+        // Then open this component
         setShowSettings(true);
         setDropdownOpen(false);
-        setSection("Settings"); // Update section title
+        setSection("Delivery Settings"); // Update section title to match the dropdown label
     };
 
     // Close dropdown and admin details when clicking outside
@@ -103,14 +148,21 @@ const AdminHome = () => {
     
     // Reset section when closing admin forms
     useEffect(() => {
-        if (!showAddAdmin && section === "Add Admin") {
-            setSection("Dashboard");
+        // Only reset to Dashboard if none of the settings components are open
+        if (!showAddAdmin && !showChangePassword && !showSettings) {
+            if (section === "Add Admin" || section === "Change Password" || section === "Delivery Settings") {
+                setSection("Dashboard");
+            }
         }
-        if (!showChangePassword && section === "Change Password") {
-            setSection("Dashboard");
+        // Update section title to match the currently open component
+        else if (showAddAdmin) {
+            setSection("Add Admin");
         }
-        if (!showSettings && section === "Settings") {
-            setSection("Dashboard");
+        else if (showChangePassword) {
+            setSection("Change Password");
+        }
+        else if (showSettings) {
+            setSection("Delivery Settings");
         }
     }, [showAddAdmin, showChangePassword, showSettings, section]);
     
@@ -136,7 +188,7 @@ const AdminHome = () => {
     }, [showLogoutModal]);
 
     return (
-        <div className="body m-0 p-0">
+        <div className="body m-0 p-0 force-bottom-space">
             <div className="container mt-4">
                 {/* Admin Header with Admin Badge and Settings */}
                 <div className="d-flex justify-content-between align-items-center">
@@ -261,13 +313,15 @@ const AdminHome = () => {
                 </div>
                 
                 {/* Dynamic Title */}
-                <div className="my-5 text-center">
-                    <h1>{section}</h1>
-                    <hr className="mb-4" />
+                <div className="my-5">
+                    <h1 className="dashboard-title">{section}</h1>
+                    <hr className="dashboard-title-hr" />
                 </div>
 
                 {/* Dynamic Content Based on Selection */}
-                {renderComponent()}
+                <div className="dashboard-container mb-5">
+                    {renderComponent()}
+                </div>
             </div>
         </div>
     );
@@ -338,22 +392,20 @@ const AdminDashboard = ({ setSection }) => {
             <div className="row text-center mb-4">
                 {stats.map((stat, index) => (
                     <div key={index} className="col-md-4">
-                        <div className="p-3 ">
-                            <h5 className="mb-1">{stat.label}</h5>
-                            <h3 className="fw-bold">{stat.value}</h3>
+                        <div className="stats-card">
+                            <h5>{stat.label}</h5>
+                            <h3>{stat.value}</h3>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Centered, Larger Cards Section */}
-            <div className="row justify-content-center">
+            <div className="cards-grid">
                 {cards.map((card, index) => (
-                    <div key={index} className="col-md-4 custom-padding">
-                        <div className="card-custom" onClick={() => setSection(card.title)}>
-                            <div className="card-body text-center">
-                                <h2 className="card-title">{card.title}</h2>
-                            </div>
+                    <div key={index} className="card-custom" onClick={() => setSection(card.title)}>
+                        <div className="card-body text-center">
+                            <h2 className="card-title">{card.title}</h2>
                         </div>
                     </div>
                 ))}

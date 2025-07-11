@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
     
     if (!user) {
         // Redirect to login if not authenticated
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/very-secret-login" replace />;
     }
     
     // Check if user is an admin
