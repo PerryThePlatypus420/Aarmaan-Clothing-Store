@@ -25,6 +25,19 @@
     flex: 1;
     min-width: 250px;
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Specific styling for information column to manage spacing */
+.footer-column:last-child .footer-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.footer-column:last-child .footer-links li {
+    margin-bottom: 8px;
 }
 
 .footer-logo {
@@ -88,6 +101,10 @@
     background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
 }
 
+.footer-column:first-child h3::after {
+    display: none;
+}
+
 .footer-links {
     list-style: none;
     padding: 0;
@@ -111,40 +128,6 @@
     padding-left: 5px;
 }
 
-.footer-subscribe {
-    display: flex;
-    margin-top: 20px;
-}
-
-.footer-subscribe input {
-    flex: 1;
-    padding: 12px 15px;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-radius: 4px 0 0 4px;
-    font-size: 0.9rem;
-}
-
-.footer-subscribe input::placeholder {
-    color: #b0b0b0;
-}
-
-.footer-subscribe button {
-    padding: 0 20px;
-    background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
-    color: #121212;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.footer-subscribe button:hover {
-    opacity: 0.9;
-}
-
 .footer-bottom {
     text-align: center;
     padding: 25px 0;
@@ -158,10 +141,17 @@
 @media (max-width: 992px) {
     .footer-row {
         justify-content: flex-start;
+        align-items: flex-start;
     }
     
     .footer-column {
         flex: 0 0 calc(50% - 30px);
+    }
+    
+    /* Stack information links in two columns on medium screens */
+    .footer-column:last-child .footer-links {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 15px;
     }
 }
 
@@ -174,19 +164,9 @@
         flex: 0 0 100%;
     }
     
-    .footer-subscribe {
-        flex-direction: column;
-    }
-    
-    .footer-subscribe input {
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    
-    .footer-subscribe button {
-        border-radius: 4px;
-        width: 100%;
-        padding: 12px;
+    /* Reset to single column on mobile */
+    .footer-column:last-child .footer-links {
+        grid-template-columns: 1fr;
     }
 }
 
