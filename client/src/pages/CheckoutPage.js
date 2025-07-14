@@ -105,7 +105,8 @@ export default function Checkout() {
                 console.log(result.message);
                 // Clear the cart after successful order
                 resetCart();
-                navigate('/completed');
+                // Navigate to completed page with order ID
+                navigate('/completed', { state: { orderId: result.order._id } });
             } catch (error) {
                 // Display specific error message from server (e.g., stock validation errors)
                 alert('Failed to submit order: ' + error.message);
@@ -143,9 +144,9 @@ export default function Checkout() {
     if (error) return <h3>Error: {error}</h3>;
 
     return (
-        <div className="mx-auto mt-5" style={{ maxWidth: '900px' }}>
-            <MDBRow>
-                <MDBCol md="8" className="mb-4">
+        <div className="mx-auto mt-5 px-3 px-md-0" style={{ maxWidth: '900px' }}>
+            <MDBRow className="mx-0">
+                <MDBCol md="8" className="mb-4 px-2 px-md-3">
                     <MDBCard className="mb-4">
                         <MDBCardHeader className="py-3">
                             <MDBTypography tag="h5" className="mb-0">Billing details</MDBTypography>
@@ -227,7 +228,7 @@ export default function Checkout() {
                         </MDBCardBody>
                     </MDBCard>
                 </MDBCol>
-                <MDBCol md="4" className="mb-4">
+                <MDBCol md="4" className="mb-4 px-2 px-md-3">
                     <MDBCard className="mb-4 shadow-sm">
                         <MDBCardHeader className="py-3 bg-light">
                             <MDBTypography tag="h5" className="mb-0 fw-bold text-dark">Order Summary</MDBTypography>

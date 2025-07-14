@@ -96,6 +96,20 @@ router.get('/total-orders', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Get a single order by ID (for completed page)
+router.get('/order/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    res.json(order);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch order' });
+  }
+});
+
 // Get all orders with product details
 router.get("/all-orders", authenticateAdmin, async (req, res) => {
   try {
