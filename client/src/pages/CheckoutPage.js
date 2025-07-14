@@ -14,6 +14,7 @@ export default function Checkout() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -73,6 +74,7 @@ export default function Checkout() {
         const isFormValid = requiredFields.every(field => formData[field].trim() !== '');
 
         if (isFormValid) {
+            setSubmitting(true);
             try {
                 // Calculate shipping cost based on settings
                 const shippingCost = (settings.freeDeliveryThreshold !== null && total >= settings.freeDeliveryThreshold) ? 0 : (settings.deliveryFee || 250);
@@ -110,6 +112,8 @@ export default function Checkout() {
             } catch (error) {
                 // Display specific error message from server (e.g., stock validation errors)
                 alert('Failed to submit order: ' + error.message);
+            } finally {
+                setSubmitting(false);
             }
         } else {
             alert('Please fill in all required fields.');
@@ -221,8 +225,21 @@ export default function Checkout() {
                                     onChange={handleInputChange}
                                 />
 
-                                <MDBBtn type='submit' className='bg-dark' size="lg" block>
-                                    Make purchase
+                                <MDBBtn type='submit' className='bg-dark' size="lg" block disabled={submitting}>
+                                    {submitting ? (
+                                        <>
+                                            <ThreeDots
+                                                height="20"
+                                                width="20"
+                                                color="white"
+                                                ariaLabel="loading"
+                                                wrapperStyle={{ display: 'inline-block', marginRight: '8px' }}
+                                            />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        'Make purchase'
+                                    )}
                                 </MDBBtn>
                             </form>
                         </MDBCardBody>
