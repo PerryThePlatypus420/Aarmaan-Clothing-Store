@@ -157,12 +157,6 @@ function MyNav() {
                                 <span className="sidebar-badge">{cart.count}</span>
                             </Link>
                         </div>
-                        
-                        <div className="sidebar-footer">
-                            <Link to='/very-secret-login' className="admin-login-link">
-                                <span>Admin Access</span>
-                            </Link>
-                        </div>
                     </div>
                 </div>
             </nav>

@@ -244,6 +244,27 @@ export default function Checkout() {
                             </form>
                         </MDBCardBody>
                     </MDBCard>
+
+                    {/* Cash on Delivery Section */}
+                    <MDBCard className="mb-4">
+                        <MDBCardHeader className="py-3">
+                            <MDBTypography tag="h5" className="mb-0">Payment Method</MDBTypography>
+                        </MDBCardHeader>
+                        <MDBCardBody>
+                            <div className="d-flex align-items-center p-3 bg-light rounded">
+                                <div className="me-3">
+                                    <i className="fas fa-money-bill-wave fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 className="mb-1 fw-bold">Cash on Delivery (COD)</h6>
+                                    <p className="mb-0 text-muted small">
+                                        Pay with cash when your order is delivered to your doorstep. 
+                                        This is the only payment method currently available.
+                                    </p>
+                                </div>
+                            </div>
+                        </MDBCardBody>
+                    </MDBCard>
                 </MDBCol>
                 <MDBCol md="4" className="mb-4 px-2 px-md-3">
                     <MDBCard className="mb-4 shadow-sm">

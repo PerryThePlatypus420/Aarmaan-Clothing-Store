@@ -351,19 +351,6 @@
     border-top: 1px solid #eaeaea;
 }
 
-.admin-login-link {
-    display: block;
-    text-align: center;
-    color: #666;
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.2s ease;
-}
-
-.admin-login-link:hover {
-    color: #000;
-    text-decoration: underline;
-}
 
 /* Media queries */
 @media (max-width: 991px) {
