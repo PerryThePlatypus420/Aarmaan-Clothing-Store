@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ProductsComp.css"; // We'll add this CSS file for validation styling
+import { toast } from 'react-toastify';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -16,6 +17,7 @@ const ProductsComp = ({ onBack }) => {
     const [originalImageIndexes, setOriginalImageIndexes] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [validationErrors, setValidationErrors] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
 
     // ✅ Fetch categories, products, and homepage products
     useEffect(() => {
@@ -135,6 +137,9 @@ const ProductsComp = ({ onBack }) => {
             : `${API_URL}/api/products/add`;
         const method = isEditing ? 'PUT' : 'POST';
 
+        // Set saving state to show loading indicator
+        setIsSaving(true);
+
         // Reset validation errors
         setValidationErrors({});
         
@@ -225,6 +230,8 @@ const ProductsComp = ({ onBack }) => {
             homepage: currentProduct.homepage
         });
         
+        setIsSaving(true); // Start loading state
+        
         fetch(url, {
             method,
             headers: {
@@ -314,8 +321,15 @@ const ProductsComp = ({ onBack }) => {
                 }
 
                 setShowModal(false);
+                toast.success(isEditing ? "Product updated successfully!" : "Product added successfully!");
             })
-            .catch(err => console.error("Error saving product:", err));
+            .catch(err => {
+                console.error("Error saving product:", err);
+                toast.error("Failed to save product. Please try again.");
+            })
+            .finally(() => {
+                setIsSaving(false); // Reset saving state regardless of outcome
+            });
     };
 
     // ✅ Handle Product Deletion with Confirmation Modal
@@ -332,6 +346,7 @@ const ProductsComp = ({ onBack }) => {
                 setProducts(products.filter(product => product.id !== currentProduct.id));
                 setShowDeleteConfirm(false);
                 setShowModal(false);
+                toast.success('Product deleted successfully!');
             })
             .catch(err => console.error(err));
     };
@@ -803,14 +818,25 @@ const ProductsComp = ({ onBack }) => {
                                 <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
                                     Cancel
                                 </button>
-                                <button className="btn btn-primary" onClick={() => {
-                                    if (isEditable) {
-                                        handleSaveProduct();
-                                    } else {
-                                        setIsEditable(true);
-                                    }
-                                }}>
-                                    {isEditable ? 'Save' : 'Edit'}
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={() => {
+                                        if (isEditable) {
+                                            handleSaveProduct();
+                                        } else {
+                                            setIsEditable(true);
+                                        }
+                                    }}
+                                    disabled={isSaving}
+                                >
+                                    {isEditable ? 
+                                        (isSaving ? 
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Saving...
+                                            </> 
+                                            : 'Save') 
+                                        : 'Edit'}
                                 </button>
                             </div>
                         </div>

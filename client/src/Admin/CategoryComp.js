@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from 'react-toastify';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -10,6 +11,7 @@ const CategoryComp = ({ onBack }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newCategory, setNewCategory] = useState({ category: "", img: "" });
     const [imageFile, setImageFile] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => { fetchCategories(); }, []);
 
@@ -31,13 +33,6 @@ const CategoryComp = ({ onBack }) => {
             .catch(error => console.error("Error fetching categories:", error));
     };
 
-    const convertImg = (base64String) => {
-        // If the image is already in base64 format, return it directly
-        if (typeof base64String === 'string' && base64String.startsWith('data:image')) {
-            return base64String;
-        }
-        return null;
-    };
 
     const openAddModal = () => {
         setNewCategory({ category: "", img: "" });
@@ -79,6 +74,7 @@ const CategoryComp = ({ onBack }) => {
     };
 
     const addCategory = () => {
+        setIsSaving(true);
         const formData = new FormData();
         formData.append("category", newCategory.category);
         if (imageFile) {
@@ -98,11 +94,17 @@ const CategoryComp = ({ onBack }) => {
             .then(() => {
                 fetchCategories();
                 setShowModal(false);
+                toast.success("Category added successfully!");
             })
-            .catch(error => console.error("Error adding category:", error));
+            .catch(error => {
+                console.error("Error adding category:", error);
+                toast.error("Error adding category. Please try again.");
+            })
+            .finally(() => setIsSaving(false));
     };
 
     const updateCategory = () => {
+        setIsSaving(true);
         const formData = new FormData();
         formData.append("category", newCategory.category);
         if (imageFile) {
@@ -122,12 +124,18 @@ const CategoryComp = ({ onBack }) => {
             .then(() => {
                 fetchCategories();
                 setShowModal(false);
+                toast.success("Category updated successfully!");
             })
-            .catch(error => console.error("Error updating category:", error));
+            .catch(error => {
+                console.error("Error updating category:", error);
+                toast.error("Error updating category. Please try again.");
+            })
+            .finally(() => setIsSaving(false));
     };
 
     const openDeleteModal = () => { setShowModal(false); setShowDeleteModal(true); };
     const deleteCategory = () => {
+        setIsSaving(true);
         // Get the authentication token
         const token = localStorage.getItem('token');
         fetch(`${API_URL}/api/categories/delete/${selectedCategory._id}`, {
@@ -139,8 +147,13 @@ const CategoryComp = ({ onBack }) => {
             .then(() => {
                 fetchCategories();
                 setShowDeleteModal(false);
+                toast.success("Category deleted successfully!");
             })
-            .catch(error => console.error("Error deleting category:", error));
+            .catch(error => {
+                console.error("Error deleting category:", error);
+                toast.error("Error deleting category. Please try again.");
+            })
+            .finally(() => setIsSaving(false));
     };
 
     const renderImage = (imageData) => {
@@ -238,12 +251,40 @@ const CategoryComp = ({ onBack }) => {
                                                 <button className="btn btn-danger" onClick={openDeleteModal}>Delete</button>
                                             </>
                                         ) : (
-                                            <button className="btn btn-success" onClick={updateCategory}>Save</button>
+                                            <button 
+                                                className="btn btn-success" 
+                                                onClick={updateCategory} 
+                                                disabled={isSaving}
+                                            >
+                                                {isSaving ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                        Saving...
+                                                    </>
+                                                ) : 'Save'}
+                                            </button>
                                         )}
-                                        <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
+                                        <button 
+                                            className="btn btn-secondary" 
+                                            onClick={() => setShowModal(false)}
+                                            disabled={isSaving}
+                                        >
+                                            Close
+                                        </button>
                                     </>
                                 ) : (
-                                    <button className="btn btn-primary" onClick={addCategory}>Add</button>
+                                    <button 
+                                        className="btn btn-primary" 
+                                        onClick={addCategory}
+                                        disabled={isSaving}
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Adding...
+                                            </>
+                                        ) : 'Add'}
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -263,8 +304,25 @@ const CategoryComp = ({ onBack }) => {
                                 <p>Are you sure you want to delete this category?</p>
                             </div>
                             <div className="modal-footer">
-                                <button className="btn btn-danger" onClick={deleteCategory}>Yes, Delete</button>
-                                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                                <button 
+                                    className="btn btn-danger" 
+                                    onClick={deleteCategory}
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Deleting...
+                                        </>
+                                    ) : 'Yes, Delete'}
+                                </button>
+                                <button 
+                                    className="btn btn-secondary" 
+                                    onClick={() => setShowDeleteModal(false)}
+                                    disabled={isSaving}
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
