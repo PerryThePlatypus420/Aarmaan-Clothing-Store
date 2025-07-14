@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import { CartContext } from "../cartContext";
 import { useContext } from "react";
 import { FaCartPlus } from "react-icons/fa";
+import { LuPlus, LuMinus } from "react-icons/lu";
 import { WishlistContext } from "../wishlistContext";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { ThreeDots } from "react-loader-spinner";
+import "./ProductDetails.css";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -228,19 +230,28 @@ function Product() {
               <div className="row g-2 align-items-end">
                 <div className="col-6 col-sm-4">
                   <label className="form-label fw-bold text-dark mb-2 small">Quantity</label>
-                  <input 
-                    className="form-control text-center border-2 rounded-2" 
-                    type="number" 
-                    min="1" 
-                    max={getMaxQuantity()}
-                    onChange={(e) => {
-                      const max = getMaxQuantity();
-                      const newValue = parseInt(e.target.value) || 1;
-                      setItems(Math.min(Math.max(1, newValue), max));
-                    }}
-                    value={items}
-                    disabled={(!selectedSize && product.sizes && product.sizes.length > 0) || getMaxQuantity() <= 0}
-                  />
+                  <div className="product-quantity-control">
+                    <button 
+                      className="quantity-button" 
+                      onClick={() => setItems((prev) => Math.max(1, prev - 1))}
+                      disabled={items <= 1 || (!selectedSize && product.sizes && product.sizes.length > 0) || getMaxQuantity() <= 0}
+                    > 
+                      <LuMinus />  
+                    </button>
+                    <span className="quantity-count">{items}</span>
+                    <button 
+                      className="quantity-button" 
+                      onClick={() => setItems((prev) => Math.min(getMaxQuantity(), prev + 1))}
+                      disabled={items >= getMaxQuantity() || (!selectedSize && product.sizes && product.sizes.length > 0) || getMaxQuantity() <= 0}
+                      style={{
+                        opacity: items >= getMaxQuantity() ? 0.5 : 1,
+                        cursor: items >= getMaxQuantity() ? 'not-allowed' : 'pointer'
+                      }}
+                    > 
+                      <LuPlus /> 
+                    </button>
+                  </div>
+                  
                 </div>
                 <div className="col-6 col-sm-8">
                   <button 

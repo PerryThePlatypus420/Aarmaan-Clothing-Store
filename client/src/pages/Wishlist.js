@@ -61,12 +61,12 @@ function Wishlist() {
 
     return (
         <>
-            <h1 className='mt-5 mb-4'>Wishlist</h1>
+            <h1 className='mt-5 h2 fw-bold text-dark mb-4'>Wishlist</h1>
 
             <div className="container">
                 <div className='row my-4'>
                     {
-                        products.length === 0 && <h3>Your wishlist is empty</h3>
+                        products.length === 0 && (<h3 className='mt-4 text-muted'>Your wishlist is empty</h3>)
                     }
                     {products.map((product, index) => (
                         <div key={product._id || index} className='col-md-3 my-3'>

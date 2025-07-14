@@ -1,0 +1,45 @@
+.product-quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.25rem;
+  width: 100%;
+}
+
+.quantity-button {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.quantity-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.quantity-button:disabled {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.quantity-count {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0.75rem;
+  min-width: 30px;
+  text-align: center;
+  color: #495057;
+}
